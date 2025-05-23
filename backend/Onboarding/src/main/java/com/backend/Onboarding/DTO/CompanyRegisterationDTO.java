@@ -15,7 +15,7 @@ public class CompanyRegisterationDTO {
     @NotBlank(message = "Company name is required")
     private String companyName;
 
-    @Size(max = 15, message = "GST registration number must be up to 15 characters")
+    @Size(min = 15, max = 15, message = "GST registration number must be up to 15 characters")
     private String gstRegistrationNumber;
 
     @Size(max = 50, message = "Short name must be up to 50 characters")
@@ -23,7 +23,7 @@ public class CompanyRegisterationDTO {
 
     @NotBlank(message = "Pincode is mandatory")
     @Size(min = 6, max = 6, message = "Pincode must be exactly 6 digits")
-    @Pattern(regexp = "\\d{6}", message = "Pincode must contain only digits")
+    @Pattern(regexp = "\\d{6}", message = "Pincode must contain 6 digits")
     private String pincode;
 
     @NotBlank(message = "Please fill address")

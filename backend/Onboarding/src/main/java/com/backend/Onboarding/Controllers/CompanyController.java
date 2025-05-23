@@ -64,7 +64,7 @@ public class CompanyController {
             return  new ResponseEntity<>(response,HttpStatus.CREATED);
         } catch (RuntimeException e) {
             System.out.println(e.getMessage());
-            throw  new RuntimeException("Failed To add Company:" +e.getMessage());
+            throw  new RuntimeException(e.getMessage());
         }
     }
 }

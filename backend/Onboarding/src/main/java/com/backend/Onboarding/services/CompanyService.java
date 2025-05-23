@@ -37,18 +37,10 @@ public class CompanyService {
 
         // Validate company details
         if (companyRepo.existsByCompanyName(dto.getCompanyName())) {
-            throw new IllegalArgumentException("Company name already exists: " + dto.getCompanyName());
-        }
-        if (dto.getPincode() == null || !dto.getPincode().matches("\\d{6}")) {
-            throw new IllegalArgumentException("Pincode must be exactly 6 digits");
+            throw new IllegalArgumentException("Company name already exists");
         }
         if (employeeRepo.existsByEmployeeEmail(dto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
-        }
-
-        // Validate baseUrl
-        if (baseUrl == null || baseUrl.trim().isEmpty()) {
-            throw new IllegalStateException("Base URL is not configured properly");
+            throw new IllegalArgumentException("Email already exists");
         }
 
         // Validate designation
@@ -56,53 +48,41 @@ public class CompanyService {
         if (designation == null || designation.trim().isEmpty()) {
             throw new IllegalArgumentException("Designation cannot be empty");
         }
-        if (!designation.equals("Owner") && !designation.equals("HR") &&
-                !designation.equals("Admin") && !designation.equals("Other")) {
-            throw new IllegalArgumentException("Designation must be 'Owner', 'HR', 'Admin', or 'Other'");
+        if (!designation.equals("OWNER") && !designation.equals("HR") && !designation.equals("OTHER")) {
+            throw new IllegalArgumentException("Designation must be 'OWNER', 'HR', 'OTHER'");
         }
-        designation = switch (designation) {
-            case "owner" -> "OWNER";
-            case "Owner" -> "OWNER";
-            case "Hr" -> "HR";
-            case "hr" -> "HR";
-            case "admin" -> "ADMIN";
-            case "Admin" -> "ADMIN";
-            case "other" -> "Other";
-            case "Other" -> "Other";
-            default -> designation;
-        };
 
         final String effectiveDesignation;
-        if (designation.equals("Other")) {
+        if (designation.equals("OTHER")) {
             if (dto.getCustomDesignation() == null || dto.getCustomDesignation().trim().isEmpty()) {
-                throw new IllegalArgumentException("Custom designation must be provided when designation is 'Other'");
+                throw new IllegalArgumentException("User Designation is required");
             }
             if (dto.getOwnerDetails() == null) {
-                throw new IllegalArgumentException("Owner details must be provided when designation is 'Other'");
+                throw new IllegalArgumentException("Owner details must be provided");
             }
             if (dto.getHrDetails() == null) {
-                throw new IllegalArgumentException("HR details must be provided when designation is 'Other'");
+                throw new IllegalArgumentException("HR details must be provided");
             }
             // Validate Owner details
             if (employeeRepo.existsByEmployeeEmail(dto.getOwnerDetails().getEmail())) {
-                throw new IllegalArgumentException("Owner email already exists: " + dto.getOwnerDetails().getEmail());
+                throw new IllegalArgumentException("Owner Email already exists");
             }
             if (!dto.getOwnerDetails().getPhone().matches("\\d{10}")) {
                 throw new IllegalArgumentException("Owner phone must be exactly 10 digits");
             }
             // Validate HR details
             if (employeeRepo.existsByEmployeeEmail(dto.getHrDetails().getEmail())) {
-                throw new IllegalArgumentException("HR email already exists: " + dto.getHrDetails().getEmail());
+                throw new IllegalArgumentException("HR email already exists");
             }
             if (!dto.getHrDetails().getPhone().matches("\\d{10}")) {
                 throw new IllegalArgumentException("HR phone must be exactly 10 digits");
             }
             // Ensure Owner and HR emails are different from the registering employee
             if (dto.getOwnerDetails().getEmail().equals(dto.getEmail())) {
-                throw new IllegalArgumentException("Owner email must be different from the registering employee's email");
+                throw new IllegalArgumentException("Owner email must be different from your email");
             }
             if (dto.getHrDetails().getEmail().equals(dto.getEmail())) {
-                throw new IllegalArgumentException("HR email must be different from the registering employee's email");
+                throw new IllegalArgumentException("HR email must be different from your email");
             }
             if (dto.getOwnerDetails().getEmail().equals(dto.getHrDetails().getEmail())) {
                 throw new IllegalArgumentException("Owner and HR emails must be different");
