@@ -36,4 +36,12 @@ public class Employees
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Set<Roles> roles = new HashSet<>();
+
+    @Column(name = "company_name")
+    private String companyName;
+
+    public String getCompanyName() {
+        return companyName != null ? companyName : (company != null ? company.getCompanyName() : null);
+    }
+
 }

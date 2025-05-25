@@ -1,7 +1,6 @@
 package com.backend.Onboarding.services;
 
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
-import com.backend.Onboarding.DTO.UrlDTO;
 import com.backend.Onboarding.entities.*;
 import com.backend.Onboarding.repo.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,6 +114,7 @@ public class CompanyService {
         // Create the registering employee
         Employees registeringEmployee = new Employees();
         registeringEmployee.setCompany(company);
+        registeringEmployee.setCompanyName(company.getCompanyName());
         registeringEmployee.setEmployeeFirstName(dto.getFirstName());
         registeringEmployee.setEmployeeLastName(dto.getLastName());
         registeringEmployee.setEmployeeEmail(dto.getEmail());
@@ -124,41 +124,9 @@ public class CompanyService {
         // Prepare additional employees if designation is "Other"
         Employees ownerEmployee = null;
         Employees hrEmployee = null;
-        if (designation.equals("Other")) {
 
-            // Owner employee
-            Set<Roles> ownerRoles = new HashSet<>();
-            Roles ownerRole = rolesRepo.findByRoleName("OWNER")
-                    .orElseThrow(() -> new IllegalArgumentException("Owner role not found in database"));
-            ownerRoles.add(ownerRole);
-            ownerEmployee = new Employees();
-            ownerEmployee.setCompany(company);
-            ownerEmployee.setEmployeeFirstName(dto.getOwnerDetails().getFirstName());
-            ownerEmployee.setEmployeeLastName(dto.getOwnerDetails().getLastName());
-            ownerEmployee.setEmployeeEmail(dto.getOwnerDetails().getEmail());
-            ownerEmployee.setEmployeePhone(dto.getOwnerDetails().getPhone());
-            ownerEmployee.setRoles(ownerRoles);
-
-            // HR employee
-            Set<Roles> hrRoles = new HashSet<>();
-            Roles hrRole = rolesRepo.findByRoleName("HR")
-                    .orElseThrow(() -> new IllegalArgumentException("HR role not found in database"));
-            hrRoles.add(hrRole);
-            hrEmployee = new Employees();
-            hrEmployee.setCompany(company);
-            hrEmployee.setEmployeeFirstName(dto.getHrDetails().getFirstName());
-            hrEmployee.setEmployeeLastName(dto.getHrDetails().getLastName());
-            hrEmployee.setEmployeeEmail(dto.getHrDetails().getEmail());
-            hrEmployee.setEmployeePhone(dto.getHrDetails().getPhone());
-            hrEmployee.setRoles(hrRoles);
-        }
-
-        // Step 4: Save all entities in the transaction
         // Save new roles first (if any)
-        Set<Roles> allRoles = new HashSet<>();
-        allRoles.addAll(registeringEmployeeRoles);
-        if (ownerEmployee != null) allRoles.addAll(ownerEmployee.getRoles());
-        if (hrEmployee != null) allRoles.addAll(hrEmployee.getRoles());
+        Set<Roles> allRoles = new HashSet<>(registeringEmployeeRoles);
         for (Roles role : allRoles) {
             if (role.getId() == null) { // New role
                 rolesRepo.save(role);
@@ -168,8 +136,6 @@ public class CompanyService {
         // Save company and employees
         company = companyRepo.save(company);
         employeeRepo.save(registeringEmployee);
-        if (ownerEmployee != null) employeeRepo.save(ownerEmployee);
-        if (hrEmployee != null) employeeRepo.save(hrEmployee);
 
         // Generate and save URL
         String urlToken = UUID.randomUUID().toString();

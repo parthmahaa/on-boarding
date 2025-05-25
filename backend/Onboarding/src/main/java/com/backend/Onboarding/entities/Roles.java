@@ -1,6 +1,5 @@
 package com.backend.Onboarding.entities;
 
-import com.backend.Onboarding.utilities.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 

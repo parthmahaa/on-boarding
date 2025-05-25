@@ -65,7 +65,7 @@ export default function OnboardingForm() {
     lastName: "",
     email: "",
     mobile: "",
-    designation: "Owner",
+    designation: "OWNER",
     customDesignation: "",
     ownerDetails: null,
     hrDetails: null,
@@ -82,7 +82,7 @@ export default function OnboardingForm() {
       phone: formData.mobile,
     }
 
-    if (formData.designation === "Owner") {
+    if (formData.designation === "OWNER") {
       setFormData((prev) => ({
         ...prev,
         ownerDetails: personDetails,
@@ -96,14 +96,7 @@ export default function OnboardingForm() {
         ownerDetails: null,
         customDesignation: "",
       }))
-    } else if (formData.designation === "Admin") {
-      setFormData((prev) => ({
-        ...prev,
-        ownerDetails: null,
-        hrDetails: null,
-        customDesignation: "",
-      }))
-    } else if (formData.designation === "Other") {
+    } else if (formData.designation === "OTHER") {
       setFormData((prev) => ({
         ...prev,
         ownerDetails: prev.ownerDetails || {
@@ -137,7 +130,12 @@ export default function OnboardingForm() {
           [subField]: value,
         },
       }))
-    } else {
+    }else if (name === "designation" || name === "customDesignation") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value.toUpperCase(), // Convert to uppercase
+      }))
+    }else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -218,8 +216,8 @@ export default function OnboardingForm() {
       lastName: formData.lastName,
       email: formData.email,
       phone: formData.mobile,
-      designation: formData.designation,
-      customDesignation: formData.designation === "Other" ? formData.customDesignation.toUpperCase() : undefined,
+      designation: formData.designation.toUpperCase(),
+      customDesignation: formData.designation === "OTHER" ? formData.customDesignation.toUpperCase() : undefined,
       ownerDetails: formData.ownerDetails,
       hrDetails: formData.hrDetails,
     }
@@ -256,7 +254,7 @@ export default function OnboardingForm() {
       lastName: "",
       email: "",
       mobile: "",
-      designation: "Owner",
+      designation: "",
       customDesignation: "",
       ownerDetails: null,
       hrDetails: null,
@@ -437,12 +435,12 @@ export default function OnboardingForm() {
                       className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     >
-                      <option value="Owner">Owner</option>
+                      <option value="OWNER">Owner</option>
                       <option value="HR">HR</option>
-                      <option value="Other">Other</option>
+                      <option value="OTHER">Other</option>
                     </select>
                   </div>
-                  {formData.designation === "Other" && (
+                  {formData.designation === "OTHER" && (
                     <div>
                       <label htmlFor="customDesignation" className="block text-sm font-medium text-gray-700 mb-1">
                         Custom Designation <span className="text-red-500">*</span>
@@ -461,11 +459,11 @@ export default function OnboardingForm() {
             </div>
 
             {/* Owner Details Section (shown for "Owner" or "Other") */}
-            {(formData.designation === "Owner" || formData.designation === "Other") && (
+            {(formData.designation === "OWNER" || formData.designation === "OTHER") && (
               <div className="bg-white border border-gray-200 rounded-lg mb-8">
                 <div className="p-5 border-b border-gray-200">
                   <h2 className="text-xl font-semibold text-gray-900">Owner Details</h2>
-                  {formData.designation === "Owner" && (
+                  {formData.designation === "OWNER" && (
                     <p className="text-sm text-gray-500 mt-1">
                       These details are read-only. Edit your details in the "Your Details" section above.
                     </p>
@@ -486,7 +484,7 @@ export default function OnboardingForm() {
                         value={formData.ownerDetails?.firstName || ""}
                         onChange={(e) => handleChange(e, "ownerDetails", "firstName")}
                         required
-                        readOnly={formData.designation === "Owner"}
+                        readOnly={formData.designation === "OWNER"}
                       />
                     </div>
                     <div>
@@ -502,7 +500,7 @@ export default function OnboardingForm() {
                         value={formData.ownerDetails?.lastName || ""}
                         onChange={(e) => handleChange(e, "ownerDetails", "lastName")}
                         required
-                        readOnly={formData.designation === "Owner"}
+                        readOnly={formData.designation === "OWNER"}
                       />
                     </div>
                     <div>
@@ -519,7 +517,7 @@ export default function OnboardingForm() {
                         value={formData.ownerDetails?.email || ""}
                         onChange={(e) => handleChange(e, "ownerDetails", "email")}
                         required
-                        readOnly={formData.designation === "Owner"}
+                        readOnly={formData.designation === "OWNER"}
                       />
                     </div>
                     <div>
@@ -536,7 +534,7 @@ export default function OnboardingForm() {
                         value={formData.ownerDetails?.phone || ""}
                         onChange={(e) => handleChange(e, "ownerDetails", "phone")}
                         required
-                        readOnly={formData.designation === "Owner"}
+                        readOnly={formData.designation === "OWNER"}
                       />
                     </div>
                   </div>
@@ -545,7 +543,7 @@ export default function OnboardingForm() {
             )}
 
             {/* HR Details Section (shown for "HR" or "Other") */}
-            {(formData.designation === "HR" || formData.designation === "Other") && (
+            {(formData.designation === "HR" || formData.designation === "OTHER") && (
               <div className="bg-white border border-gray-200 rounded-lg mb-8">
                 <div className="p-5 border-b border-gray-200">
                   <h2 className="text-xl font-semibold text-gray-900">HR Details</h2>
@@ -560,35 +558,35 @@ export default function OnboardingForm() {
                     <div>
                       <label htmlFor="hrDetails.firstName" className="block text-sm font-medium text-gray-700 mb-1">
                         HR First Name{" "}
-                        <span className="text-red-500">{formData.designation === "Other" ? "*" : ""}</span>
+                        <span className="text-red-500">{formData.designation === "OTHER" ? "*" : ""}</span>
                       </label>
                       <Input
                         id="hrDetails.firstName"
                         name="hrDetails.firstName"
                         value={formData.hrDetails?.firstName || ""}
                         onChange={(e) => handleChange(e, "hrDetails", "firstName")}
-                        required={formData.designation === "Other"}
+                        required={formData.designation === "OTHER"}
                         readOnly={formData.designation === "HR"}
                       />
                     </div>
                     <div>
                       <label htmlFor="hrDetails.lastName" className="block text-sm font-medium text-gray-700 mb-1">
                         HR Last Name{" "}
-                        <span className="text-red-500">{formData.designation === "Other" ? "*" : ""}</span>
+                        <span className="text-red-500">{formData.designation === "OTHER" ? "*" : ""}</span>
                       </label>
                       <Input
                         id="hrDetails.lastName"
                         name="hrDetails.lastName"
                         value={formData.hrDetails?.lastName || ""}
                         onChange={(e) => handleChange(e, "hrDetails", "lastName")}
-                        required={formData.designation === "Other"}
+                        required={formData.designation === "OTHER"}
                         readOnly={formData.designation === "HR"}
                       />
                     </div>
                     <div>
                       <label htmlFor="hrDetails.email" className="block text-sm font-medium text-gray-700 mb-1">
                         HR Mail ID{" "}
-                        <span className="text-red-500">{formData.designation === "Other" ? "*" : ""}</span>
+                        <span className="text-red-500">{formData.designation === "OTHER" ? "*" : ""}</span>
                       </label>
                       <Input
                         id="hrDetails.email"
@@ -596,14 +594,14 @@ export default function OnboardingForm() {
                         type="email"
                         value={formData.hrDetails?.email || ""}
                         onChange={(e) => handleChange(e, "hrDetails", "email")}
-                        required={formData.designation === "Other"}
+                        required={formData.designation === "OTHER"}
                         readOnly={formData.designation === "HR"}
                       />
                     </div>
                     <div>
                       <label htmlFor="hrDetails.phone" className="block text-sm font-medium text-gray-700 mb-1">
                         HR Mobile Number{" "}
-                        <span className="text-red-500">{formData.designation === "Other" ? "*" : ""}</span>
+                        <span className="text-red-500">{formData.designation === "OTHER" ? "*" : ""}</span>
                       </label>
                       <Input
                         id="hrDetails.phone"
@@ -611,7 +609,7 @@ export default function OnboardingForm() {
                         type="tel"
                         value={formData.hrDetails?.phone || ""}
                         onChange={(e) => handleChange(e, "hrDetails", "phone")}
-                        required={formData.designation === "Other"}
+                        required={formData.designation === "OTHER"}
                         readOnly={formData.designation === "HR"}
                       />
                     </div>

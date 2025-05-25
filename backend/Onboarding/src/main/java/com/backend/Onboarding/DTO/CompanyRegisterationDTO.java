@@ -1,13 +1,8 @@
 package com.backend.Onboarding.DTO;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Value;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
 
 @Data
 public class CompanyRegisterationDTO {
