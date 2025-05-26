@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/utilities/PasswordGenerator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/CompanyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/CompanyController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyRegisterationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyRegisterationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/OnboardingApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/OnboardingApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Roles.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Roles.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/EmployeeRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/EmployeeRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/OnBoardingForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/OnBoardingForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/lib/util.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../client/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,8 +24,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>

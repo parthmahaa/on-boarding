@@ -143,9 +143,11 @@ export default function OnboardingForm() {
     }
   }
 
+
+  const [loading, setLoading] = useState(false)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    setLoading(true)
     // Validation logic
     if (formData.gstNumber && formData.gstNumber.length !== 15) {
       toast.error("GST number should be exactly 15 characters")
@@ -239,7 +241,10 @@ export default function OnboardingForm() {
         )
       }
     } catch (err: any) {
-      toast.error("Failed to submit form. Please try again.")
+      toast.error("Failed to submit. Please try again.")
+    }
+    finally{
+      setLoading(false)
     }
   }
 
@@ -628,9 +633,19 @@ export default function OnboardingForm() {
               </button>
               <button
                 type="submit"
+                disabled={loading}
                 className="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm transition-colors"
               >
-                Submit
+              {
+                loading ? (
+                  <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                  <div>
+                    Submit
+                  </div>
+                )}
               </button>
             </div>
           </form>

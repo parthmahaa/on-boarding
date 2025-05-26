@@ -28,6 +28,9 @@ public class Employees
     @Column(nullable = false, unique = true)
     private String employeeEmail;
 
+    @Column(name = "password", nullable = false) // Add password field
+    private String password;
+
     @Column(nullable = false)
     private String employeePhone;
 

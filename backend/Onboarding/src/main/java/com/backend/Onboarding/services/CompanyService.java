@@ -3,31 +3,33 @@ package com.backend.Onboarding.services;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.*;
 import com.backend.Onboarding.repo.*;
+import com.backend.Onboarding.utilities.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class CompanyService {
 
     private final CompanyRepo companyRepo;
-    private final UrlRepo urlRepo;
+    private final EmailService emailService;
     private final EmployeeRepo employeeRepo;
     private final RolesRepo rolesRepo;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${app.onboarding.base-url}")
     private String baseUrl;
 
-    public CompanyService(CompanyRepo companyRepo, EmployeeRepo employeeRepo,
-                          RolesRepo rolesRepo, UrlRepo urlRepo) {
+    public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder) {
         this.companyRepo = companyRepo;
-        this.urlRepo = urlRepo;
+        this.emailService = emailService;
         this.employeeRepo = employeeRepo;
         this.rolesRepo = rolesRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -121,32 +123,110 @@ public class CompanyService {
         registeringEmployee.setEmployeePhone(dto.getPhone());
         registeringEmployee.setRoles(registeringEmployeeRoles);
 
+        String registeringEmployeeRawPassword = PasswordGenerator.generateRandomPassword(12);
+        registeringEmployee.setPassword(passwordEncoder.encode(registeringEmployeeRawPassword));
+
         // Prepare additional employees if designation is "Other"
         Employees ownerEmployee = null;
         Employees hrEmployee = null;
+        String ownerRawPassword = null;
+        String hrRawPassword = null;
+        if (designation.equals("OTHER")) {
+            // Owner employee
+            Set<Roles> ownerRoles = new HashSet<>();
+            Roles ownerRole = rolesRepo.findByRoleName("OWNER")
+                    .orElseGet(() -> {
+                        Roles newRole = new Roles();
+                        newRole.setRoleName("OWNER");
+                        return newRole;
+                    });
+            ownerRoles.add(ownerRole);
+            ownerEmployee = new Employees();
+            ownerEmployee.setCompany(company);
+            ownerEmployee.setCompanyName(company.getCompanyName());
+            ownerEmployee.setEmployeeFirstName(dto.getOwnerDetails().getFirstName());
+            ownerEmployee.setEmployeeLastName(dto.getOwnerDetails().getLastName());
+            ownerEmployee.setEmployeeEmail(dto.getOwnerDetails().getEmail());
+            ownerEmployee.setEmployeePhone(dto.getOwnerDetails().getPhone());
+            ownerEmployee.setRoles(ownerRoles);
+            // Generate and hash the password for the owner
+            ownerRawPassword = PasswordGenerator.generateRandomPassword(12);
+            ownerEmployee.setPassword(passwordEncoder.encode(ownerRawPassword));
 
-        // Save new roles first (if any)
+            // HR employee
+            Set<Roles> hrRoles = new HashSet<>();
+            Roles hrRole = rolesRepo.findByRoleName("HR")
+                    .orElseGet(() -> {
+                        Roles newRole = new Roles();
+                        newRole.setRoleName("HR");
+                        return newRole;
+                    });
+            hrRoles.add(hrRole);
+            hrEmployee = new Employees();
+            hrEmployee.setCompany(company);
+            hrEmployee.setCompanyName(company.getCompanyName());
+            hrEmployee.setEmployeeFirstName(dto.getHrDetails().getFirstName());
+            hrEmployee.setEmployeeLastName(dto.getHrDetails().getLastName());
+            hrEmployee.setEmployeeEmail(dto.getHrDetails().getEmail());
+            hrEmployee.setEmployeePhone(dto.getHrDetails().getPhone());
+            hrEmployee.setRoles(hrRoles);
+            // Generate and hash the password for HR
+            hrRawPassword = PasswordGenerator.generateRandomPassword(12);
+            hrEmployee.setPassword(passwordEncoder.encode(hrRawPassword));
+        }
+
+        // Step 4: Save all entities in the transaction
         Set<Roles> allRoles = new HashSet<>(registeringEmployeeRoles);
+        if (ownerEmployee != null) allRoles.addAll(ownerEmployee.getRoles());
+        if (hrEmployee != null) allRoles.addAll(hrEmployee.getRoles());
         for (Roles role : allRoles) {
             if (role.getId() == null) { // New role
                 rolesRepo.save(role);
             }
         }
 
-        // Save company and employees
         company = companyRepo.save(company);
         employeeRepo.save(registeringEmployee);
+        if (ownerEmployee != null) employeeRepo.save(ownerEmployee);
+        if (hrEmployee != null) employeeRepo.save(hrEmployee);
 
-        // Generate and save URL
-        String urlToken = UUID.randomUUID().toString();
-        String fullUrl = baseUrl + "/company-onboarding?token=" + urlToken;
 
-        Urls url = new Urls();
-        url.setCompany(company);
-        url.setUrlToken(urlToken);
-        urlRepo.save(url);
+        // Step 5: Send emails to all users with credentials
+        // Registering employee
+        try {
+            emailService.sendCredentialsEmailAsync(
+                    registeringEmployee.getEmployeeEmail(),
+                    registeringEmployee.getEmployeeEmail(),
+                    registeringEmployeeRawPassword
+            );
+        } catch (Exception e) {
+            System.err.println("Failed to send email to " + registeringEmployee.getEmployeeEmail() + ": " + e.getMessage());
+        }
 
-        return fullUrl;
+        // Owner and HR if designation is "OTHER"
+        if (designation.equals("OTHER")) {
+            try {
+                emailService.sendCredentialsEmailAsync(
+                        ownerEmployee.getEmployeeEmail(),
+                        ownerEmployee.getEmployeeEmail(),
+                        ownerRawPassword
+                );
+            } catch (Exception e) {
+                System.err.println("Failed to send email to " + ownerEmployee.getEmployeeEmail() + ": " + e.getMessage());
+            }
+
+            try {
+                emailService.sendCredentialsEmailAsync(
+                        hrEmployee.getEmployeeEmail(),
+                        hrEmployee.getEmployeeEmail(),
+                        hrRawPassword
+                );
+            } catch (Exception e) {
+                System.err.println("Failed to send email to " + hrEmployee.getEmployeeEmail() + ": " + e.getMessage());
+            }
+        }
+
+        return "Mail Sent";
     }
 
 }
