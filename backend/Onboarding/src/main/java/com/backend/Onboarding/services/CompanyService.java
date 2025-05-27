@@ -3,14 +3,16 @@ package com.backend.Onboarding.services;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.*;
 import com.backend.Onboarding.repo.*;
+import com.backend.Onboarding.utilities.CompanyStatus;
 import com.backend.Onboarding.utilities.PasswordGenerator;
+import com.backend.Onboarding.entities.PendingRegistration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class CompanyService {
@@ -20,21 +22,23 @@ public class CompanyService {
     private final EmployeeRepo employeeRepo;
     private final RolesRepo rolesRepo;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final OtpService otpService;
+    private final Map<String, PendingRegistration> pendingRegistrations = new HashMap<>();
 
     @Value("${app.onboarding.base-url}")
     private String baseUrl;
 
-    public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder) {
+    public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder, OtpService otpService) {
         this.companyRepo = companyRepo;
         this.emailService = emailService;
         this.employeeRepo = employeeRepo;
         this.rolesRepo = rolesRepo;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
-    @Transactional
-    public String registerCompany(CompanyRegisterationDTO dto) {
-        // Step 1: Perform all validations before saving anything to the database
+    public String initiateRegistration(CompanyRegisterationDTO dto) {
+        // Step 1: Perform all validations before proceeding
 
         // Validate company details
         if (companyRepo.existsByCompanyName(dto.getCompanyName())) {
@@ -93,7 +97,48 @@ public class CompanyService {
             effectiveDesignation = designation;
         }
 
-        // Step 2: Prepare the company entity
+        // Step 2: Generate a token and OTP
+        String token = UUID.randomUUID().toString();
+        String otp = otpService.generateOtp();
+        LocalDateTime expiry = otpService.calculateExpiry();
+
+        // Step 3: Store the registration data temporarily
+        PendingRegistration pending = new PendingRegistration();
+        pending.setToken(token);
+        pending.setRegistrationDTO(dto);
+        pending.setOtp(otp);
+        pending.setExpiry(expiry);
+        pendingRegistrations.put(token, pending);
+
+        // Step 4: Send OTP to the registering employee's email
+        try {
+            emailService.sendOtpAsync(dto.getEmail(), otp);
+        } catch (Exception e) {
+            System.err.println("Failed to send OTP to " + dto.getEmail() + ": " + e.getMessage());
+            throw new RuntimeException("Failed to send OTP");
+        }
+
+        return token;
+    }
+
+    @Transactional
+    public String completeRegistration(String token, String userPassword, String providedOtp) {
+        // Step 1: Retrieve and validate the pending registration
+        PendingRegistration pending = pendingRegistrations.get(token);
+        if (pending == null) {
+            throw new IllegalArgumentException("Invalid or expired registration token");
+        }
+
+        // Step 2: Verify the OTP
+        if (!otpService.verifyOtp(providedOtp, pending.getOtp(), pending.getExpiry())) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        CompanyRegisterationDTO dto = pending.getRegistrationDTO();
+        String designation = dto.getDesignation();
+        final String effectiveDesignation = designation.equals("OTHER") ? dto.getCustomDesignation() : designation;
+
+        // Step 3: Prepare the company entity
         CompanyEntity company = new CompanyEntity();
         company.setCompanyName(dto.getCompanyName());
         company.setGstRegisterationNumber(dto.getGstRegistrationNumber());
@@ -101,15 +146,16 @@ public class CompanyService {
         company.setPincode(dto.getPincode());
         company.setAddress(dto.getAddress());
         company.setNoOfEmployees(dto.getNumberOfEmployees());
+        company.setStatus(CompanyStatus.CREATED);
 
-        // Step 3: Prepare roles and employees
+        // Step 4: Prepare roles and employees
         // Registering employee's role
         Set<Roles> registeringEmployeeRoles = new HashSet<>();
         Roles designationRole = rolesRepo.findByRoleName(effectiveDesignation)
                 .orElseGet(() -> {
                     Roles newRole = new Roles();
                     newRole.setRoleName(effectiveDesignation);
-                    return newRole;
+                    return rolesRepo.save(newRole);
                 });
         registeringEmployeeRoles.add(designationRole);
 
@@ -122,11 +168,9 @@ public class CompanyService {
         registeringEmployee.setEmployeeEmail(dto.getEmail());
         registeringEmployee.setEmployeePhone(dto.getPhone());
         registeringEmployee.setRoles(registeringEmployeeRoles);
+        registeringEmployee.setPassword(passwordEncoder.encode(userPassword)); // Use user-provided password
 
-        String registeringEmployeeRawPassword = PasswordGenerator.generateRandomPassword(12);
-        registeringEmployee.setPassword(passwordEncoder.encode(registeringEmployeeRawPassword));
-
-        // Prepare additional employees if designation is "Other"
+        // Prepare additional employees if designation is "OTHER"
         Employees ownerEmployee = null;
         Employees hrEmployee = null;
         String ownerRawPassword = null;
@@ -138,7 +182,7 @@ public class CompanyService {
                     .orElseGet(() -> {
                         Roles newRole = new Roles();
                         newRole.setRoleName("OWNER");
-                        return newRole;
+                        return rolesRepo.save(newRole);
                     });
             ownerRoles.add(ownerRole);
             ownerEmployee = new Employees();
@@ -159,7 +203,7 @@ public class CompanyService {
                     .orElseGet(() -> {
                         Roles newRole = new Roles();
                         newRole.setRoleName("HR");
-                        return newRole;
+                        return rolesRepo.save(newRole);
                     });
             hrRoles.add(hrRole);
             hrEmployee = new Employees();
@@ -175,7 +219,7 @@ public class CompanyService {
             hrEmployee.setPassword(passwordEncoder.encode(hrRawPassword));
         }
 
-        // Step 4: Save all entities in the transaction
+        // Step 5: Save all entities in the transaction
         Set<Roles> allRoles = new HashSet<>(registeringEmployeeRoles);
         if (ownerEmployee != null) allRoles.addAll(ownerEmployee.getRoles());
         if (hrEmployee != null) allRoles.addAll(hrEmployee.getRoles());
@@ -190,20 +234,7 @@ public class CompanyService {
         if (ownerEmployee != null) employeeRepo.save(ownerEmployee);
         if (hrEmployee != null) employeeRepo.save(hrEmployee);
 
-
-        // Step 5: Send emails to all users with credentials
-        // Registering employee
-        try {
-            emailService.sendCredentialsEmailAsync(
-                    registeringEmployee.getEmployeeEmail(),
-                    registeringEmployee.getEmployeeEmail(),
-                    registeringEmployeeRawPassword
-            );
-        } catch (Exception e) {
-            System.err.println("Failed to send email to " + registeringEmployee.getEmployeeEmail() + ": " + e.getMessage());
-        }
-
-        // Owner and HR if designation is "OTHER"
+        // Step 6: Send emails to owner and HR if designation is "OTHER"
         if (designation.equals("OTHER")) {
             try {
                 emailService.sendCredentialsEmailAsync(
@@ -226,7 +257,13 @@ public class CompanyService {
             }
         }
 
-        return "Mail Sent";
+        // Step 7: Remove the pending registration
+        pendingRegistrations.remove(token);
+
+        return "Registration completed successfully";
     }
 
+    public PendingRegistration getPendingRegistration(String token) {
+        return pendingRegistrations.get(token);
+    }
 }

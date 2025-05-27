@@ -20,7 +20,4 @@ public class ResponseWrapper<T> {
     private String message;
     private T data;
     private boolean isError;
-
-    public ResponseWrapper(LocalDateTime now, int value, String fetchedCompanies, List<CompanyAdminDTO> companies, Object o) {
-    }
 }

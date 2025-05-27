@@ -18,12 +18,29 @@ export type Company = {
 };
 
 export type ApiResponse = {
-  time: string;
-  status: number;
+  time?: string;
+  status?: number;
   message: string;
-  data: Company[];
-  error: boolean;
+  data?: any;
+  error?: boolean;
 };
+
+export interface RegistrationDTO {
+  companyName: string
+  shortName: string
+  gstRegistrationNumber: string
+  pincode: string
+  address: string
+  numberOfEmployees: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  designation: string
+  customDesignation?: string
+  ownerDetails: PersonDetails | null
+  hrDetails: PersonDetails | null
+}
 
 export type FormData = {
   companyName: string
@@ -39,6 +56,12 @@ export type FormData = {
   customDesignation: string
   ownerDetails: PersonDetails | null
   hrDetails: PersonDetails | null
+}
+
+export interface PendingRegistration {
+  registrationDTO: RegistrationDTO
+  otp: string
+  otpExpiry: string
 }
 
 export interface Employee {

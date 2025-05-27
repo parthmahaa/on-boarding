@@ -52,7 +52,6 @@ public class AdminController {
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
         }catch (Exception e){
-            e.printStackTrace();
             ResponseWrapper<String> response = new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),

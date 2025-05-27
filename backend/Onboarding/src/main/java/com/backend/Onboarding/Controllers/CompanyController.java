@@ -2,8 +2,10 @@ package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
+import com.backend.Onboarding.entities.PendingRegistration;
 import com.backend.Onboarding.services.CompanyService;
-import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,22 +22,98 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @PostMapping(path = "/register")
-    public ResponseEntity<ResponseWrapper<String>> addCompanyDetails(@RequestBody @Valid CompanyRegisterationDTO dto){
+    @PostMapping("/register")
+    public ResponseEntity<ResponseWrapper<String>> initiateRegistration(@RequestBody CompanyRegisterationDTO dto) {
         try {
-            String companyUrl = companyService.registerCompany(dto);
+            String token = companyService.initiateRegistration(dto);
             ResponseWrapper<String> response = new ResponseWrapper<>(
                     LocalDateTime.now(),
-                    HttpStatus.CREATED.value(),
-                    "Company Added",
-                    companyUrl,
+                    HttpStatus.OK.value(),
+                    "Registration Initiated",
+                    token,
+                    false
+            );
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            ResponseWrapper<String> response = new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Registration failed:" + e.getMessage(),
+                    null,
                     false
             );
 
-            return  new ResponseEntity<>(response,HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            throw  new RuntimeException(e.getMessage());
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            ResponseWrapper<String> response = new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Registration Failed:"+ e.getMessage(),
+                    null,
+                    false
+            );
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/pending-registration/{token}")
+    public ResponseEntity<ResponseWrapper<PendingRegistration>> getPendingRegistration(@PathVariable String token) {
+        try {
+            PendingRegistration pending = companyService.getPendingRegistration(token);
+            if (pending == null) {
+
+                ResponseWrapper<PendingRegistration> response = new ResponseWrapper<>(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        "Registeration Details not Found",
+                        null,
+                        true
+                );
+                return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Pending Registration",
+                    pending,
+                    false
+            ),HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch Data:" +e.getMessage());
+        }
+    }
+
+    @PostMapping("/complete-registration/{token}")
+    public ResponseEntity<ResponseWrapper<String>> completeRegistration(
+            @PathVariable String token,
+            @RequestBody CompleteRegistrationDTO completeDTO) {
+        try {
+            String result = companyService.completeRegistration(token, completeDTO.getPassword(), completeDTO.getOtp());
+            return ResponseEntity.ok(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Company Onboarded",
+                    result,
+                    false
+            ));
+
+        } catch (IllegalArgumentException e) {
+            ResponseWrapper<String> response = new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Registration Failed:"+ e.getMessage(),
+                    null,
+                    false
+            );
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+}
+
+@Getter
+@Setter
+class CompleteRegistrationDTO {
+    private String password;
+    private String otp;
+
 }

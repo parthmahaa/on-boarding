@@ -1,15 +1,16 @@
 "use client"
 
-import React from "react"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import img1 from '../assets/img1.png'
 import { type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { clsx } from "clsx"
 import Navbar from "./Navbar"
-import type { PersonDetails, FormData } from '../utilities/types'
+import type { PersonDetails, FormData, PendingRegistration, ApiResponse } from '../utilities/types'
 import { API_URL } from "../services/api"
+
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -33,8 +34,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
 })
 Input.displayName = "Input"
 
-
 export default function OnboardingForm() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState<FormData>({
     companyName: "",
     shortName: "",
@@ -50,6 +51,15 @@ export default function OnboardingForm() {
     ownerDetails: null,
     hrDetails: null,
   })
+
+  const [loading, setLoading] = useState(false)
+  const [showOtpPopup, setShowOtpPopup] = useState(false)
+  const [registrationToken, setRegistrationToken] = useState<string | null>(null)
+  const [otp, setOtp] = useState("")
+  const [password, setPassword] = useState("")
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [pendingRegistration, setPendingRegistration] = useState<PendingRegistration | null>(null)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   // Pre-fill Owner or HR details when designation is "Owner" or "HR"
   useEffect(() => {
@@ -93,6 +103,40 @@ export default function OnboardingForm() {
     }
   }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.designation])
 
+  // Fetch PendingRegistration when the popup is shown
+  // useEffect(() => {
+  //   if (showOtpPopup && registrationToken) {
+  //     const fetchPendingRegistration = async () => {
+  //       try {
+  //         console.log(`Fetching pending registration with token: ${registrationToken}`)
+  //         console.log(`API URL: ${API_URL}/companies/pending-registration/${registrationToken}`)
+  //         const response = await fetch(`${API_URL}/company/pending-registration/${registrationToken}`, {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         })
+  //         if (!response.ok) {
+  //           throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`)
+  //         }
+  //         const result: ApiResponse = await response.json()
+  //         console.log("Pending registration response:", result)
+  //         if (result.error) {
+  //           throw new Error(result.message || "Failed to fetch pending registration")
+  //         }
+  //         setPendingRegistration(result.data as PendingRegistration)
+  //         setFetchError(null)
+  //       } catch (err: any) {
+  //         console.error("Error fetching pending registration:", err)
+  //         setFetchError(err.message || "Failed to load registration data")
+  //         toast.warn("Unable to load registration details. Please enter the OTP you received via email.")
+  //         // Do not close the popup; let the user enter the OTP manually
+  //       }
+  //     }
+  //     fetchPendingRegistration()
+  //   }
+  // }, [showOtpPopup, registrationToken])
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     nestedField?: "ownerDetails" | "hrDetails",
@@ -108,12 +152,12 @@ export default function OnboardingForm() {
           [subField]: value,
         },
       }))
-    }else if (name === "designation" || name === "customDesignation") {
+    } else if (name === "designation" || name === "customDesignation") {
       setFormData((prev) => ({
         ...prev,
         [name]: value.toUpperCase(), // Convert to uppercase
       }))
-    }else {
+    } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -121,31 +165,35 @@ export default function OnboardingForm() {
     }
   }
 
-
-  const [loading, setLoading] = useState(false)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
     // Validation logic
     if (formData.gstNumber && formData.gstNumber.length !== 15) {
       toast.error("GST number should be exactly 15 characters")
+      setLoading(false)
       return
     }
     if (!/^\d{6}$/.test(formData.pincode)) {
       toast.error("Pincode should be 6 digits")
+      setLoading(false)
       return
     }
     if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
       toast.error("Please enter a valid email address for the user")
+      setLoading(false)
       return
     }
     if (!/^\d{10}$/.test(formData.mobile)) {
       toast.error("User mobile number should be 10 digits")
+      setLoading(false)
       return
     }
-    if (formData.designation === "Other") {
+    if (formData.designation === "OTHER") {
       if (!formData.customDesignation) {
         toast.error("Custom designation is required when 'Other' is selected")
+        setLoading(false)
         return
       }
       if (
@@ -155,6 +203,7 @@ export default function OnboardingForm() {
         !formData.ownerDetails?.phone
       ) {
         toast.error("All owner details are required when designation is 'Other'")
+        setLoading(false)
         return
       }
       if (
@@ -164,22 +213,27 @@ export default function OnboardingForm() {
         !formData.hrDetails?.phone
       ) {
         toast.error("All HR details are required when designation is 'Other'")
+        setLoading(false)
         return
       }
       if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.ownerDetails.email)) {
         toast.error("Please enter a valid email address for the owner")
+        setLoading(false)
         return
       }
       if (!/^\d{10}$/.test(formData.ownerDetails.phone)) {
         toast.error("Owner mobile number should be 10 digits")
+        setLoading(false)
         return
       }
       if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.hrDetails.email)) {
         toast.error("Please enter a valid email address for the HR")
+        setLoading(false)
         return
       }
       if (!/^\d{10}$/.test(formData.hrDetails.phone)) {
         toast.error("HR mobile number should be 10 digits")
+        setLoading(false)
         return
       }
     }
@@ -210,19 +264,57 @@ export default function OnboardingForm() {
         },
         body: JSON.stringify(payload),
       })
-      const result = await response.json()
+      const result: ApiResponse = await response.json()
       if (result.error) {
         toast.error(result.message || "An error occurred")
       } else {
-        toast.success(
-          "Company Added"
-        )
+        setRegistrationToken(result.data as string || null)
+        setShowOtpPopup(true)
+        toast.info("Please check your email for the OTP")
       }
     } catch (err: any) {
-      toast.error("Failed to submit. Please try again.")
-    }
-    finally{  
+      toast.error("Failed to initiate registration. Please try again.")
+    } finally {
       setLoading(false)
+    }
+  }
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!registrationToken) {
+      toast.error("Registration token is missing")
+      return
+    }
+
+    // Basic validation for password
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long")
+      return
+    }
+
+    setOtpLoading(true)
+
+    try {
+      const response = await fetch(`${API_URL}/company/complete-registration/${registrationToken}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otp, password }),
+      })
+      const result: ApiResponse = await response.json()
+      if (result.error) {
+        toast.error(result.message || "Failed to verify OTP")
+      } else {
+        toast.success("Company registered successfully!")
+        setShowOtpPopup(false)
+        navigate("/home")
+      }
+    } catch (err: any) {
+      console.log(err.message);
+      toast.error("Failed to complete registration. Please try again.")
+    } finally {
+      setOtpLoading(false)
     }
   }
 
@@ -247,7 +339,7 @@ export default function OnboardingForm() {
   return (
     <div className="min-h-screen bg-white text-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="">
+        <div className={showOtpPopup ? "transition-all duration-300 ease-in-out filter blur-sm" : ""}>
           <p className="text-gray-700 mb-8 text-base">Just a few details to kick off your Onboarding journey —</p>
           <form onSubmit={handleSubmit}>
             {/* Basic Details Section */}
@@ -555,23 +647,99 @@ export default function OnboardingForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm transition-colors"
+                className="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
               >
-              {
-                loading ? (
+                {loading ? (
                   <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                ) : (
-                  <div>
-                    Submit
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   </div>
+                ) : (
+                  <div>Submit</div>
                 )}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {/* OTP and Password Popup */}
+      {showOtpPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+          <div className="bg-white border border-gray-200 rounded-lg max-w-md w-full">
+            <div className="p-5 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Verify OTP and Set Password</h2>
+            </div>
+            <div className="p-5">
+              {fetchError && (
+                <p className="text-yellow-600 mb-4">{fetchError}</p>
+              )}
+              {pendingRegistration ? (
+                <p className="text-gray-600 mb-6">
+                  An OTP has been sent to {pendingRegistration.registrationDTO.email}. Please enter the OTP and set your password.
+                </p>
+              ) : (
+                <p className="text-gray-600 mb-6">Please enter the OTP you received via email and set your password.</p>
+              )}
+              <form onSubmit={handleOtpSubmit}>
+                <div className="mb-4">
+                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
+                    OTP <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="otp"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                    placeholder="Enter 6-digit OTP"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowOtpPopup(false)
+                      setRegistrationToken(null)
+                      setOtp("")
+                      setPassword("")
+                      setPendingRegistration(null)
+                      setFetchError(null)
+                    }}
+                    className="px-5 py-2.5 rounded-md bg-red-500 text-white hover:bg-gray-300 font-medium text-sm transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={otpLoading}
+                    className="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                  >
+                    {otpLoading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : (
+                      <div>Verify and Register</div>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

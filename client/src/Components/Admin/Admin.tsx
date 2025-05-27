@@ -157,7 +157,7 @@ const Admin: React.FC = () => {
                         {getStatusBadge(company.companyStatus)}
                       </td>
                     </tr>
-                    {/* Dropdown row */}
+                    //dropdown
                     <tr>
                       <td colSpan={5} className="p-0 border-none">
                         <div

@@ -39,4 +39,20 @@ public class EmailService {
             throw new RuntimeException("Failed to send email to " + toEmail + ": " + e.getMessage(), e);
         }
     }
+
+    @Async
+    public void sendOtpAsync(String toEmail, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Your OTP for Registration");
+        message.setText(
+                "Dear User,\n\n" +
+                        "Please use the following OTP to complete your registration:\n" +
+                        "OTP: " + otp + "\n\n" +
+                        "This OTP is valid for 10 minutes.\n\n" +
+                        "Best regards,\n" +
+                        "Your Application Team"
+        );
+        mailSender.send(message);
+    }
 }
