@@ -1,5 +1,6 @@
 package com.backend.Onboarding.entities;
 
+import com.backend.Onboarding.utilities.CompanyStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -41,8 +44,15 @@ public class CompanyEntity {
     @Column(name = "short_name")
     private String shortName;
 
-    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private Urls url;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private CompanyStatus status = CompanyStatus.CREATED; // Default to CREATED
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Employees> employees = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

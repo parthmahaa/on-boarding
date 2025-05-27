@@ -7,7 +7,9 @@ import img1 from '../assets/img1.png'
 import { type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { clsx } from "clsx"
-
+import Navbar from "./Navbar"
+import type { PersonDetails, FormData } from '../utilities/types'
+import { API_URL } from "../services/api"
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -31,28 +33,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
 })
 Input.displayName = "Input"
 
-type PersonDetails = {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-}
-
-type FormData = {
-  companyName: string
-  shortName: string
-  gstNumber: string
-  pincode: string
-  address: string
-  firstName: string
-  lastName: string
-  email: string
-  mobile: string
-  designation: string
-  customDesignation: string
-  ownerDetails: PersonDetails | null
-  hrDetails: PersonDetails | null
-}
 
 export default function OnboardingForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -70,8 +50,6 @@ export default function OnboardingForm() {
     ownerDetails: null,
     hrDetails: null,
   })
-
-  const [showContact, setShowContact] = useState(false);
 
   // Pre-fill Owner or HR details when designation is "Owner" or "HR"
   useEffect(() => {
@@ -225,7 +203,7 @@ export default function OnboardingForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/company/register", {
+      const response = await fetch(`${API_URL}/company/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -243,7 +221,7 @@ export default function OnboardingForm() {
     } catch (err: any) {
       toast.error("Failed to submit. Please try again.")
     }
-    finally{
+    finally{  
       setLoading(false)
     }
   }
@@ -269,65 +247,8 @@ export default function OnboardingForm() {
   return (
     <div className="min-h-screen bg-white text-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <header className="flex flex-col sm:flex-row items-center mb-10">
-          <div className="mr-4 mb-4 sm:mb-0">
-            <img src={img1} alt="Emgage" width={100} height={75} />
-          </div>
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-bold text-gray-900">Welcome to Emgage !</h1>
-            <p className="text-base text-gray-600 mt-1">
-              your all-in-one HRMS to simplify, streamline, and supercharge your people operation
-            </p>
-          </div>
-          <div className="ml-0 sm:ml-auto flex items-center mt-4 sm:mt-0 relative">
-            <button
-              className="p-1.5 mr-3 text-gray-500 hover:text-gray-700"
-              aria-label="Help"
-              type="button"
-              onClick={() => setShowContact((v) => !v)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v-4" />
-                <path d="M12 8h.01" />
-              </svg>
-            </button>
-            {showContact && (
-              <div className="absolute right-0 top-10 z-50 bg-white border border-gray-200 rounded shadow-lg p-4 w-64 text-sm">
-                <div className="font-semibold mb-2">Contact Support</div>
-                <div>
-                  <div>
-                    <span className="font-medium">Phone:</span> +91-9876543210
-                  </div>
-                  <div>
-                    <span className="font-medium">Email:</span>{" "}
-                    <a href="mailto:support@emgage.in" className="text-blue-600 underline">
-                      support@emgage.in
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="flex items-center">
-              <img src={img1} alt="Emgage" width={30} height={30} />
-              <span className="ml-2 text-gray-700 font-medium text-sm">Emgage pvt ltd</span>
-            </div>
-          </div>
-        </header>
-
-        <div className="mt-8">
+        <div className="">
           <p className="text-gray-700 mb-8 text-base">Just a few details to kick off your Onboarding journey —</p>
-
           <form onSubmit={handleSubmit}>
             {/* Basic Details Section */}
             <div className="bg-white border border-gray-200 rounded-lg mb-8">

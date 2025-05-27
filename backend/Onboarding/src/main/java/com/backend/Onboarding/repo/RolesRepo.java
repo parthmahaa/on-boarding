@@ -1,7 +1,6 @@
 package com.backend.Onboarding.repo;
 
 import com.backend.Onboarding.entities.Roles;
-import com.backend.Onboarding.utilities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
