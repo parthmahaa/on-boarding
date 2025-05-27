@@ -51,7 +51,7 @@ public class EmailService {
                         "OTP: " + otp + "\n\n" +
                         "This OTP is valid for 10 minutes.\n\n" +
                         "Best regards,\n" +
-                        "Your Application Team"
+                        "Emgage"
         );
         mailSender.send(message);
     }

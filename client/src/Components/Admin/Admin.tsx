@@ -3,6 +3,7 @@ import Navbar from "../Navbar";
 import { toast } from "react-toastify";
 import type { Company, ApiResponse } from "../../utilities/types";
 import { API_URL } from "../../services/api";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Admin: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -11,6 +12,7 @@ const Admin: React.FC = () => {
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const navigate= useNavigate()
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
@@ -84,8 +86,7 @@ const Admin: React.FC = () => {
 
   // Handler for "View" button
   const handleView = (company: Company) => {
-    toast.info(`Viewing employees for ${company.companyName}`);
-    // You can navigate to a detailed view here
+    navigate(`viewEmployees/${company.id}`)
   };
 
   // Handler for "Drop" button
@@ -157,7 +158,6 @@ const Admin: React.FC = () => {
                         {getStatusBadge(company.companyStatus)}
                       </td>
                     </tr>
-                    //dropdown
                     <tr>
                       <td colSpan={5} className="p-0 border-none">
                         <div

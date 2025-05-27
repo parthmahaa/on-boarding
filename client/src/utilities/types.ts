@@ -68,7 +68,10 @@ export interface Employee {
   id: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   email: string;
   phone: string;
+  branch : string;
   roles: string[];
+  status? : String
 }

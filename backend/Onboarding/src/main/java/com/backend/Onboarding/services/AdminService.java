@@ -70,4 +70,25 @@ public class AdminService {
             throw new IllegalArgumentException("Invalid UUID format for ID: " + id);
         }
     }
+
+    public List<EmployeeAdminDTO> getCompanyEmployees(String companyIdStr) {
+        UUID companyId;
+        try {
+            companyId = UUID.fromString(companyIdStr);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format for company ID: " + companyIdStr);
+        }
+
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found with ID: " + companyId));
+
+        List<Employees> employees = company.getEmployees();
+        if (employees == null || employees.isEmpty()) {
+            return List.of();
+           }
+
+        return employees.stream()
+                .map(this::mapToEmployeeAdminDTO)
+                .collect(Collectors.toList());
+    }
 }

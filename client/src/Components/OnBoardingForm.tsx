@@ -311,7 +311,7 @@ export default function OnboardingForm() {
         navigate("/home")
       }
     } catch (err: any) {
-      console.log(err.message);
+      console.log(err.mee);
       toast.error("Failed to complete registration. Please try again.")
     } finally {
       setOtpLoading(false)

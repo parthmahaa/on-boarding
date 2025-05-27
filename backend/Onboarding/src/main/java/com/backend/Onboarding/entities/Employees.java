@@ -34,6 +34,12 @@ public class Employees
     @Column(nullable = false)
     private String employeePhone;
 
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "branch")
+    private String branch;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "employee_roles", joinColumns = @JoinColumn(name = "employee_id"))
     @Enumerated(EnumType.STRING)
@@ -46,5 +52,7 @@ public class Employees
     public String getCompanyName() {
         return companyName != null ? companyName : (company != null ? company.getCompanyName() : null);
     }
+
+
 
 }
