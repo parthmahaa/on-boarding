@@ -6,13 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyRegisterationDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/CompanyRegisterationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/EmployeeAdminDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/EmployeeAdminDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/EmployeeRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/EmployeeRepo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/AdminService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/Admin/Admin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/Admin/Admin.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/Components/OnBoardingForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/OnBoardingForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/utilities/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/utilities/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/Components/Home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/Home.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/Components/ImportEmployees.tsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,22 +47,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.OnboardingApplication.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Code/on-boarding/backend&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.importing&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.OnboardingApplication.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/Code/on-boarding/backend",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="" />
@@ -67,5 +72,16 @@
       <updated>1747918829946</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -6,10 +6,14 @@ import java.util.Set;
 
 @Data
 public class EmployeeAdminDTO {
-    private Long id;
+
+    // this is the DTO when admin will try to access the employee details of a company
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
+    private String branch;
+    private String status;
     private Set<String> roles;
 }

@@ -50,6 +50,8 @@ public class AdminService {
         dto.setFirstName(employee.getEmployeeFirstName());
         dto.setLastName(employee.getEmployeeLastName());
         dto.setEmail(employee.getEmployeeEmail());
+        dto.setBranch(employee.getBranch());
+        dto.setStatus(employee.getStatus());
         dto.setPhone(employee.getEmployeePhone());
         dto.setRoles(employee.getRoles().stream()
                 .map(Roles::getRoleName)

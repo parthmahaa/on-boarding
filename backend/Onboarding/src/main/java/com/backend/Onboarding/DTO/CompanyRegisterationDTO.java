@@ -56,6 +56,9 @@ public class CompanyRegisterationDTO {
     // Nested DTO for Owner and HR details
     @Data
     public static class EmployeeDetailsDTO {
+
+        private String id;
+
         @NotBlank(message = "First name cannot be empty")
         private String firstName;
 

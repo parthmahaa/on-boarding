@@ -2,6 +2,7 @@ package com.backend.Onboarding.entities;
 
 import com.backend.Onboarding.utilities.CompanyStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,6 +53,7 @@ public class CompanyEntity {
     private CompanyStatus status = CompanyStatus.CREATED; // Default to CREATED
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Employees> employees = new ArrayList<>();
 
     @CreationTimestamp

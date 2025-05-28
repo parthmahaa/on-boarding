@@ -161,6 +161,7 @@ public class CompanyService {
 
         // Create the registering employee
         Employees registeringEmployee = new Employees();
+        registeringEmployee.setId(UUID.randomUUID().toString()); // Always generate UUID since DTO has no id
         registeringEmployee.setCompany(company);
         registeringEmployee.setCompanyName(company.getCompanyName());
         registeringEmployee.setEmployeeFirstName(dto.getFirstName());
@@ -186,6 +187,8 @@ public class CompanyService {
                     });
             ownerRoles.add(ownerRole);
             ownerEmployee = new Employees();
+            ownerEmployee.setId(dto.getOwnerDetails().getId() != null && !dto.getOwnerDetails().getId().isEmpty() ?
+                    dto.getOwnerDetails().getId() : UUID.randomUUID().toString());
             ownerEmployee.setCompany(company);
             ownerEmployee.setCompanyName(company.getCompanyName());
             ownerEmployee.setEmployeeFirstName(dto.getOwnerDetails().getFirstName());
@@ -207,6 +210,8 @@ public class CompanyService {
                     });
             hrRoles.add(hrRole);
             hrEmployee = new Employees();
+            hrEmployee.setId(dto.getHrDetails().getId() != null && !dto.getHrDetails().getId().isEmpty() ?
+                    dto.getHrDetails().getId() : UUID.randomUUID().toString());
             hrEmployee.setCompany(company);
             hrEmployee.setCompanyName(company.getCompanyName());
             hrEmployee.setEmployeeFirstName(dto.getHrDetails().getFirstName());
