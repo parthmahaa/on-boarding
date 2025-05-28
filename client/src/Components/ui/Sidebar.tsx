@@ -3,9 +3,8 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Home, Building2, GitBranch, Users, Clock, Calendar,
-  FileText, CalendarDays, Workflow, HelpCircle, LogOut, ChevronDown
+  FileText, CalendarDays, Workflow, HelpCircle,
 } from 'lucide-react';
-import Avatar from './Avatar';
 
 const navigation = [
   { name: "Dashboard", icon: Home, path: "/dashboard" },
@@ -28,22 +27,38 @@ interface SidebarProps {
   onLogout: () => void;
 }
 
-export function Sidebar({ user, onLogout }: SidebarProps) {
+export function Sidebar({ user }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+
+  // Collapse sidebar if not on dashboard
+  const isCollapsed = pathname !== "/dashboard";
 
   const handleNavigation = (path: string) => {
     window.location.href = path;
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-white border-r flex flex-col justify-between">
+    <aside className={`min-h-screen bg-white border-r flex flex-col justify-between transition-all duration-200`}>
       <div>
-        <div className="flex items-center gap-2 p-4 border-b">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm">
-            CL
-          </div>
-          <span className="font-bold text-blue-600">Company Logo</span>
+        <div className={`flex items-center gap-2 p-4 border-b ${isCollapsed ? 'justify-center' : ''}`}>
+          {/* Logo: show icon only when collapsed, icon+text when expanded */}
+          <span className="flex items-center">
+            {/* Example SVG logo, replace with your logo as needed */}
+            <svg
+              className="w-8 h-8 text-blue-600"
+              fill="none"
+              viewBox="0 0 32 32"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <circle cx="16" cy="16" r="14" />
+              <text x="16" y="21" textAnchor="middle" fontSize="14" fill="currentColor" fontFamily="Arial">C</text>
+            </svg>
+            {!isCollapsed && (
+              <span className="font-bold text-blue-600 ml-2">Company Logo</span>
+            )}
+          </span>
         </div>
 
         <nav className="flex flex-col p-2">
@@ -51,32 +66,15 @@ export function Sidebar({ user, onLogout }: SidebarProps) {
             <button
               key={item.name}
               onClick={() => handleNavigation(item.path)}
-              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 text-left ${
+              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 text-left transition-all duration-200 ${
                 pathname === item.path ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'
-              }`}
+              } ${isCollapsed ? 'justify-center' : ''}`}
             >
-              <item.icon className="h-4 w-4" />
-              <span>{item.name}</span>
+              <item.icon className="h-6 w-6" />
+              {!isCollapsed && <span>{item.name}</span>}
             </button>
           ))}
         </nav>
-      </div>
-
-      <div className="p-4 border-t">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={onLogout}>
-          <Avatar name={user.name} />
-          <div className="flex flex-col text-sm">
-            <span className="font-semibold">{user.name}</span>
-            <span className="text-gray-500 text-xs">{user.email}</span>
-          </div>
-          <ChevronDown className="ml-auto h-4 w-4 text-gray-500" />
-        </div>
-        <button
-          className="mt-2 flex items-center text-red-600 hover:underline text-sm"
-          onClick={onLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" /> Log out
-        </button>
       </div>
     </aside>
   );

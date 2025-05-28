@@ -1,20 +1,21 @@
-import DashboardLayout from './DashboardLayout';
+import ImportEmployees from './ImportEmployees';
 
-function Home() {
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-  };
+type HomeProps = {
+  isImportEmployees?: boolean;
+};
 
-  const handleLogout = () => {
-    console.log('User logged out');
-  };
-
+function Home({ isImportEmployees }: HomeProps) {
   return (
-    <DashboardLayout user={user} onLogout={handleLogout}>
-      <h1 className="text-2xl font-semibold mb-4">Welcome Home</h1>
-      <p className="text-gray-500">This is your home page.</p>
-    </DashboardLayout>
+    <>
+      {isImportEmployees ? (
+        <ImportEmployees />
+      ) : (
+        <>
+          <h1 className="text-2xl font-semibold mb-4">Welcome Home</h1>
+          <p className="text-gray-500">This is your home page.</p>
+        </>
+      )}
+    </>
   );
 }
 

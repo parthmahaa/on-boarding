@@ -3,7 +3,7 @@ import Navbar from "../Navbar";
 import { toast } from "react-toastify";
 import type { Company, ApiResponse } from "../../utilities/types";
 import { API_URL } from "../../services/api";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Admin: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -118,7 +118,7 @@ const Admin: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-left mb-6">Company List</h1>
 
-          {loading && <p className="text-center text-blue-500">Loading...</p>}
+          {loading && <CompanySkeleton/>}
           {error && <p className="text-center text-red-500">Error: {error}</p>}
 
           {/* Horizontal scrollable company cards */}

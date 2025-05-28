@@ -8,6 +8,17 @@ import Home from './Components/Home';
 import Navbar from './Components/Navbar';
 import { AlertTriangle, Lock } from 'lucide-react';
 import ViewEmployees from './Components/Admin/ViewEmployees';
+import ImportEmployees from './Components/ImportEmployees';
+import DashboardLayout from './Components/DashboardLayout';
+// Import all sidebar page components
+import Company from './Components/SidebarPages/Company';
+import Branch from './Components/SidebarPages/Branch';
+import WorkSchedule from './Components/SidebarPages/WorkSchedule';
+import AttendancePolicy from './Components/SidebarPages/AttendancePolicy';
+import LeavePolicy from './Components/SidebarPages/LeavePolicy';
+import Holiday from './Components/SidebarPages/Holiday';
+import WorkflowManagement from './Components/SidebarPages/WorkflowManagement';
+import OtherDetails from './Components/SidebarPages/OtherDetails';
 
 function Layout() {
   return (
@@ -66,7 +77,26 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/viewEmployees/:companyId" element={<ViewEmployees />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<Home />} />
+          {/* Sidebar navigation routes */}
+          <Route
+            element={
+              <DashboardLayout
+                user={{ name: 'John Doe', email: 'john@example.com' }}
+                onLogout={() => { console.log('User logged out'); }}
+              />
+            }
+          >
+            <Route path="/dashboard" element={<Home />} />
+            <Route path="/company" element={<Company />} />
+            <Route path="/branch" element={<Branch />} />
+            <Route path="/import-employees" element={<Home isImportEmployees />} />
+            <Route path="/work-schedule" element={<WorkSchedule />} />
+            <Route path="/attendance-policy" element={<AttendancePolicy />} />
+            <Route path="/leave-policy" element={<LeavePolicy />} />
+            <Route path="/holiday" element={<Holiday />} />
+            <Route path="/workflow-management" element={<WorkflowManagement />} />
+            <Route path="/other-details" element={<OtherDetails />} />
+          </Route>
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
