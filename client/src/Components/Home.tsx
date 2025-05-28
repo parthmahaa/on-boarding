@@ -1,4 +1,4 @@
-import ImportEmployees from './ImportEmployees';
+import ImportEmployees from '../Components/SidebarPages/ImportEmployees';
 
 type HomeProps = {
   isImportEmployees?: boolean;

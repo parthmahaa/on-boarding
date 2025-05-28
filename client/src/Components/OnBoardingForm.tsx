@@ -87,13 +87,13 @@ export default function OnboardingForm() {
     } else if (formData.designation === "OTHER") {
       setFormData((prev) => ({
         ...prev,
-        ownerDetails: prev.ownerDetails || {
+        ownerDetails:{
           firstName: "",
           lastName: "",
           email: "",
           phone: "",
         },
-        hrDetails: prev.hrDetails || {
+        hrDetails:{
           firstName: "",
           lastName: "",
           email: "",
@@ -304,14 +304,15 @@ export default function OnboardingForm() {
       })
       const result: ApiResponse = await response.json()
       if (result.error) {
+        console.log(result.error);
         toast.error(result.message || "Failed to verify OTP")
       } else {
         toast.success("Company registered successfully!")
         setShowOtpPopup(false)
-        navigate("/home")
+        navigate("/dashboard")
       }
     } catch (err: any) {
-      console.log(err.mee);
+      console.log(err.message);
       toast.error("Failed to complete registration. Please try again.")
     } finally {
       setOtpLoading(false)

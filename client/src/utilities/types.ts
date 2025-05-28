@@ -75,3 +75,38 @@ export interface Employee {
   roles: string[];
   status? : String
 }
+
+// Add this type for employee form data (matches AddEmployee.tsx)
+export type EmployeeFormData = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    middleName: string;
+    dateOfJoining: string;
+    dateOfBirth: string;
+    actualDateOfBirth: string;
+    gender: string;
+    sbu: string;
+    department: string; // <-- Add this line
+    subDepartment: string;
+    branch: string;
+    complianceBranch: string;
+    designation: string;
+    grade: string;
+    employeeType: string;
+    employmentType: string;
+    probationStatus: string;
+    salaryOn: string; // <-- Add this line
+    officialEmail: string;
+    probationEndDate: string;
+    appraisalDate: string;
+    countOffDayInAttendance: boolean;
+    countHolidayInAttendance: boolean;
+    primaryManagerId: string;
+    secondaryManagerId: string;
+    paymentMethod: string;
+    aadharNo: string;
+    panNo: string;
+    companyId: string;
+    companyName: string;
+};

@@ -8,8 +8,9 @@ import Home from './Components/Home';
 import Navbar from './Components/Navbar';
 import { AlertTriangle, Lock } from 'lucide-react';
 import ViewEmployees from './Components/Admin/ViewEmployees';
-import ImportEmployees from './Components/ImportEmployees';
+import ImportEmployees from './Components/SidebarPages/ImportEmployees';
 import DashboardLayout from './Components/DashboardLayout';
+import AddEmployee from './Components/Employees/AddEmployee';
 // Import all sidebar page components
 import Company from './Components/SidebarPages/Company';
 import Branch from './Components/SidebarPages/Branch';
@@ -81,8 +82,8 @@ function App() {
           <Route
             element={
               <DashboardLayout
-                user={{ name: 'John Doe', email: 'john@example.com' }}
-                onLogout={() => { console.log('User logged out'); }}
+              user={{ name: 'John Doe', email: 'john@example.com' }}
+              onLogout={() => { console.log('User logged out'); }}
               />
             }
           >
@@ -92,6 +93,7 @@ function App() {
             <Route path="/import-employees" element={<Home isImportEmployees />} />
             <Route path="/work-schedule" element={<WorkSchedule />} />
             <Route path="/attendance-policy" element={<AttendancePolicy />} />
+            <Route path="/addEmployee/:companyId" element={<AddEmployee />} />
             <Route path="/leave-policy" element={<LeavePolicy />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/workflow-management" element={<WorkflowManagement />} />

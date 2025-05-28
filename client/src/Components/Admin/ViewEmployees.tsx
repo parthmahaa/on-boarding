@@ -55,10 +55,10 @@ const ViewEmployees: React.FC = () => {
                 <tr key={emp.id}>
                   <td className="px-4 py-2">{emp.fullName || `${emp.firstName} ${emp.lastName}`}</td>
                   <td className="px-4 py-2">{emp.email}</td>
-                  <td className="px-4 py-2">{emp.phone}</td>
-                  <td className="px-4 py-2">{emp.branch}</td>
-                  <td className="px-4 py-2">{emp.roles?.join(", ")}</td>
-                  <td className="px-4 py-2">{emp.status || "-"}</td>
+                  <td className="px-4 py-2">{emp.phone || "NA"}</td>
+                  <td className="px-4 py-2">{emp.branch || "NA"}</td>
+                  <td className="px-4 py-2">{emp.roles?.join(", ") || "NA "}</td>
+                  <td className="px-4 py-2">{emp.status || "NA"}</td>
                 </tr>
               ))}
             </tbody>
