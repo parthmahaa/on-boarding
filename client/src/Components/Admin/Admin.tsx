@@ -118,7 +118,6 @@ const Admin: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-left mb-6">Company List</h1>
 
-          {error && <p className="text-center text-red-500">Error: {error}</p>}
 
           {/* Horizontal scrollable company cards */}
           <div className="overflow-x-auto rounded-2xl shadow-lg bg-white border border-gray-200">
@@ -133,6 +132,7 @@ const Admin: React.FC = () => {
                 </tr>
               </thead>
               {loading && <CompanySkeleton/>}
+              {error && <p className="text-center text-center items-center p-4 text-red-500">Error: {error}</p>}
               {!loading && !error && companies.length === 0 ? (
                 <p className="text-gray-600 p-3 text-center">No companies found.</p>
               ) : (<tbody className="divide-y divide-gray-100">

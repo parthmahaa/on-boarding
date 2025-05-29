@@ -5,6 +5,7 @@ import Sidebar from './ui/Sidebar';
 import Avatar from './ui/Avatar';
 
 interface DashboardLayoutProps {
+  children: React.ReactNode;
   user: {
     name: string;
     email: string;

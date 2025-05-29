@@ -43,7 +43,7 @@ type AddEmployeeFormProps = {
     initialData?: Partial<EmployeeFormData>
 };
 
-const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
+const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     const { companyId } = useParams<{ companyId: string }>();
 
     // State for form fields
@@ -58,7 +58,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         gender: '',
         sbu: initialData?.sbu || '',
         department: initialData?.department || '',
-        subDepartment: '',
+        subDepartment: '', // <-- keep for type compatibility, but will not use in UI or logic
         branch: '',
         complianceBranch: '',
         designation: '',
@@ -77,13 +77,14 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         paymentMethod: '',
         aadharNo: '',
         panNo: '',
-        companyId: companyId || '6b2d2e20-a25f-4bdb-9620-ef86c274b810',
+        companyId: companyId || '',
         companyName: 'Tech Corp',
         ...initialData,
     });
 
     // State for dependent dropdown options
-    const [subDepartments, setSubDepartments] = useState<string[]>([]);
+    // Remove subDepartments state
+    // const [subDepartments, setSubDepartments] = useState<string[]>([]);
     const [complianceBranches, setComplianceBranches] = useState<string[]>([]);
     const [employmentTypes, setEmploymentTypes] = useState<string[]>([]);
 
@@ -126,6 +127,16 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         'WorkingDay'
     ];
 
+    useEffect(() => {
+        // Sync pickers with formData (for reset)
+        setDateOfJoiningPicker(formData.dateOfJoining ? new Date(formData.dateOfJoining) : null);
+        setDateOfBirthPicker(formData.dateOfBirth ? new Date(formData.dateOfBirth) : null);
+        setActualDateOfBirthPicker(formData.actualDateOfBirth ? new Date(formData.actualDateOfBirth) : null);
+        setProbationEndDatePicker(formData.probationEndDate ? new Date(formData.probationEndDate) : null);
+        setAppraisalDatePicker(formData.appraisalDate ? new Date(formData.appraisalDate) : null);
+    // eslint-disable-next-line
+    }, []);
+
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -136,7 +147,6 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                 : value
         }));
     };
-
 
     // Update complianceBranch options when branch changes
     useEffect(() => {
@@ -158,16 +168,6 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         }
     }, [formData.employeeType]);
 
-    // Sync pickers with formData (for reset)
-    useEffect(() => {
-        setDateOfJoiningPicker(formData.dateOfJoining ? new Date(formData.dateOfJoining) : null);
-        setDateOfBirthPicker(formData.dateOfBirth ? new Date(formData.dateOfBirth) : null);
-        setActualDateOfBirthPicker(formData.actualDateOfBirth ? new Date(formData.actualDateOfBirth) : null);
-        setProbationEndDatePicker(formData.probationEndDate ? new Date(formData.probationEndDate) : null);
-        setAppraisalDatePicker(formData.appraisalDate ? new Date(formData.appraisalDate) : null);
-    // eslint-disable-next-line
-    }, []);
-
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -184,6 +184,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
             appraisalDate: formatDate(appraisalDatePicker),
         };
         try {
+            console.log(dataToSend);
             const response = await fetch(`${API_URL}/employees/addEmployee`,{
                 method: 'POST',
                 headers: {
@@ -194,7 +195,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
             });
             const result = await response.json();
             if (response.ok) {
-                alert('Employee added successfully!');
+                toast.success('Employee added successfully!');
                 // Reset form
                 setFormData({
                     id: '',
@@ -226,8 +227,8 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                     paymentMethod: '',
                     aadharNo: '',
                     panNo: '',
-                    companyId: companyId || 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-                    companyName: 'Tech Corp'
+                    companyId: formData.companyId ,
+                    companyName: formData.companyName,
                 });
                 setDateOfJoiningPicker(null);
                 setDateOfBirthPicker(null);
@@ -244,32 +245,8 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
 
     return (
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-center">Add New Employee</h2>
+            <h2 className="text-2xl font-bold mb-6 text-red-500 text-left">{formData.companyName}</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Company Information (Prefilled)
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                        <input
-                            type="text"
-                            name="companyName"
-                            value={formData.companyName}
-                            readOnly
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-100"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Company ID</label>
-                        <input
-                            type="text"
-                            name="companyId"
-                            value={formData.companyId}
-                            readOnly
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-100"
-                        />
-                    </div>
-                </div> */}  
-                {/* Employee ID */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Employee ID (Optional)</label>
                     <input
@@ -426,16 +403,18 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                         </select>
                     </div>
                 </div>
+                {/* Sub Department as optional free-text input */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Sub Department</label>
+                    <label className="block text-sm font-medium text-gray-700">Sub Department (Optional)</label>
                     <input
+                        type="text"
                         name="subDepartment"
                         value={formData.subDepartment}
                         onChange={handleChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        placeholder=""
                     />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Branch *</label>
@@ -730,4 +709,4 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     );
 };
 
-export default AddEmployeeForm;
+export default CollectEmployee;

@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
-import img1 from '../assets/img1.png'
 import { type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { clsx } from "clsx"
-import Navbar from "./Navbar"
 import type { PersonDetails, FormData, PendingRegistration, ApiResponse } from '../utilities/types'
 import { API_URL } from "../services/api"
 
@@ -50,6 +48,8 @@ export default function OnboardingForm() {
     customDesignation: "",
     ownerDetails: null,
     hrDetails: null,
+    // Add numberOfEmployees to formData state
+    numberOfEmployees: 1,
   })
 
   const [loading, setLoading] = useState(false)
@@ -157,6 +157,11 @@ export default function OnboardingForm() {
         ...prev,
         [name]: value.toUpperCase(), // Convert to uppercase
       }))
+    } else if (name === "numberOfEmployees") {
+      setFormData((prev) => ({
+        ...prev,
+        numberOfEmployees: value === "" ? 0 : Number(value),
+      }))
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -172,6 +177,12 @@ export default function OnboardingForm() {
     // Validation logic
     if (formData.gstNumber && formData.gstNumber.length !== 15) {
       toast.error("GST number should be exactly 15 characters")
+      setLoading(false)
+      return
+    }
+    // Validate numberOfEmployees
+    if (!formData.numberOfEmployees || isNaN(Number(formData.numberOfEmployees)) || Number(formData.numberOfEmployees) <= 0) {
+      toast.error("Please enter a valid number of employees")
       setLoading(false)
       return
     }
@@ -245,7 +256,7 @@ export default function OnboardingForm() {
       gstRegistrationNumber: formData.gstNumber,
       pincode: formData.pincode,
       address: formData.address,
-      numberOfEmployees: 1, // Default value since not collected in the form
+      numberOfEmployees: Number(formData.numberOfEmployees), // Use the collected value
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
@@ -334,6 +345,7 @@ export default function OnboardingForm() {
       customDesignation: "",
       ownerDetails: null,
       hrDetails: null,
+      numberOfEmployees: NaN,
     })
   }
 
@@ -373,11 +385,33 @@ export default function OnboardingForm() {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="lg:col-span-1">
-                    <label htmlFor="gstNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                      GST Registration Number
-                    </label>
-                    <Input id="gstNumber" name="gstNumber" value={formData.gstNumber} onChange={handleChange} />
+                  {/* GST and Number of Employees side by side */}
+                  <div className="lg:col-span-1 flex gap-2">
+                    <div className="flex-1">
+                      <label htmlFor="gstNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                        GST Registration Number
+                      </label>
+                      <Input
+                        id="gstNumber"
+                        name="gstNumber"
+                        value={formData.gstNumber}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="numberOfEmployees" className="block text-sm font-medium text-gray-700 mb-1">
+                        Number of Employees <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        id="numberOfEmployees"
+                        name="numberOfEmployees"
+                        type="number"
+                        min={1}
+                        value={formData.numberOfEmployees}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-x-6 gap-y-4 mt-4">
