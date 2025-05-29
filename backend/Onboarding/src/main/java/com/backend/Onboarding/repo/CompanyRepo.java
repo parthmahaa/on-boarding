@@ -12,4 +12,5 @@ public interface CompanyRepo extends JpaRepository<CompanyEntity, UUID> {
     Optional<CompanyEntity> findOneByCompanyName(String companyName);
     boolean existsByCompanyName(String companyName); // Add this method
     List<Employees> findEmployeesByCompanyId(UUID companyId);
+    Optional<CompanyEntity> findByPublicUrl(String publicUrl);
 }

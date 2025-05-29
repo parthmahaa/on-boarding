@@ -1,5 +1,6 @@
 package com.backend.Onboarding.services;
 
+import com.backend.Onboarding.DTO.CompanyBasicDTO;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.*;
 import com.backend.Onboarding.repo.*;
@@ -27,6 +28,9 @@ public class CompanyService {
 
     @Value("${app.onboarding.base-url}")
     private String baseUrl;
+
+    private static final String BASE62_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final int URL_LENGTH = 8;
 
     public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder, OtpService otpService) {
         this.companyRepo = companyRepo;
@@ -147,6 +151,9 @@ public class CompanyService {
         company.setAddress(dto.getAddress());
         company.setNoOfEmployees(dto.getNumberOfEmployees());
         company.setStatus(CompanyStatus.CREATED);
+
+        String publicUrl = generateUniquePublicUrl();
+        company.setPublicUrl(publicUrl);
 
         // Step 4: Prepare roles and employees
         // Registering employee's role
@@ -270,5 +277,32 @@ public class CompanyService {
 
     public PendingRegistration getPendingRegistration(String token) {
         return pendingRegistrations.get(token);
+    }
+
+    private String generateUniquePublicUrl() {
+        Random random = new Random();
+        StringBuilder shortCode;
+        boolean isUnique;
+
+        do {
+            shortCode = new StringBuilder();
+            for (int i = 0; i < URL_LENGTH; i++) {
+                shortCode.append(BASE62_CHARS.charAt(random.nextInt(BASE62_CHARS.length())));
+            }
+            isUnique = !companyRepo.findByPublicUrl(shortCode.toString()).isPresent();
+        } while (!isUnique);
+
+        return shortCode.toString();
+    }
+
+    public CompanyBasicDTO getCompanyNameAndId(String publicUrl) {
+
+        CompanyEntity company = companyRepo.findByPublicUrl(publicUrl).orElseThrow(() -> new RuntimeException("Company Not Found"));
+
+        CompanyBasicDTO fetchedCompany = new CompanyBasicDTO();
+        fetchedCompany.setCompanyId(company.getCompanyId().toString());
+        fetchedCompany.setCompanyName(company.getCompanyName());
+
+        return fetchedCompany;
     }
 }

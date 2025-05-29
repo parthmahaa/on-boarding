@@ -45,8 +45,8 @@ public class CompanyEntity {
     @Column(name = "short_name")
     private String shortName;
 
-    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
-    private Urls url;
+    @Column(nullable = false, unique = true)
+    private String publicUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
