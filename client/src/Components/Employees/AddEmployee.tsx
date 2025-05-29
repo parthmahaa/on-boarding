@@ -95,7 +95,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     const [appraisalDatePicker, setAppraisalDatePicker] = useState<Date | null>(null);
 
     // Predefined values
-    const departments = ['HR', 'IT', 'Finance'];
+    const departments = ['HR', 'IT', 'Finance & Accounting','Sales' ,'Marketing', 'Management', 'Operations' ,'Customer Support/ Service' ,'Legal' ,'Product / R&D' , 'Administration/Facilities','Excecutive Management', 'Procurement/Purchasing'];
     const sbuOptions = ['SBU1', 'SBU2'];
     const grades = ['G1', 'G2', 'G3', 'G4'];
     const branches = ['HQ', 'Branch A', 'Branch B'];
@@ -227,7 +227,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                     aadharNo: '',
                     panNo: '',
                     companyId: companyId || 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-                    companyName: 'Tech Corp'
+                    companyName: ''
                 });
                 setDateOfJoiningPicker(null);
                 setDateOfBirthPicker(null);

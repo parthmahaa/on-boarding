@@ -60,6 +60,7 @@ export default function OnboardingForm() {
   const [otpLoading, setOtpLoading] = useState(false)
   const [pendingRegistration, setPendingRegistration] = useState<PendingRegistration | null>(null)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   // Pre-fill Owner or HR details when designation is "Owner" or "HR"
   useEffect(() => {
@@ -160,7 +161,7 @@ export default function OnboardingForm() {
     } else if (name === "numberOfEmployees") {
       setFormData((prev) => ({
         ...prev,
-        numberOfEmployees: value === "" ? 0 : Number(value),
+        numberOfEmployees: Number(value),
       }))
     } else {
       setFormData((prev) => ({
@@ -345,13 +346,18 @@ export default function OnboardingForm() {
       customDesignation: "",
       ownerDetails: null,
       hrDetails: null,
-      numberOfEmployees: NaN,
+      numberOfEmployees: "1",
     })
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-800">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-white text-gray-800 relative">
+      {/* Main content, always rendered */}
+      <div
+        className={`container mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-all duration-300 ease-in-out ${
+          showOtpPopup ? "filter blur-sm pointer-events-none select-none" : ""
+        }`}
+      >
         <div className={showOtpPopup ? "transition-all duration-300 ease-in-out filter blur-sm" : ""}>
           <p className="text-gray-700 mb-8 text-base">Just a few details to kick off your Onboarding journey —</p>
           <form onSubmit={handleSubmit}>
@@ -405,8 +411,7 @@ export default function OnboardingForm() {
                       <Input
                         id="numberOfEmployees"
                         name="numberOfEmployees"
-                        type="number"
-                        min={1}
+                        type="text"
                         value={formData.numberOfEmployees}
                         onChange={handleChange}
                         required
@@ -699,77 +704,98 @@ export default function OnboardingForm() {
 
       {/* OTP and Password Popup */}
       {showOtpPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-          <div className="bg-white border border-gray-200 rounded-lg max-w-md w-full">
-            <div className="p-5 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Verify OTP and Set Password</h2>
-            </div>
-            <div className="p-5">
-              {fetchError && (
-                <p className="text-yellow-600 mb-4">{fetchError}</p>
-              )}
-              {pendingRegistration ? (
-                <p className="text-gray-600 mb-6">
-                  An OTP has been sent to {pendingRegistration.registrationDTO.email}. Please enter the OTP and set your password.
-                </p>
-              ) : (
-                <p className="text-gray-600 mb-6">Please enter the OTP you received via email and set your password.</p>
-              )}
-              <form onSubmit={handleOtpSubmit}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Blurred overlay */}
+          <div className="absolute inset-0 backdrop-blur-xs"></div>
+          {/* Popup */}
+          <div className="absolute z-50 bg-white rounded-xl shadow-lg max-w-sm w-full">
+            {/* Close (X) button */}
+            <button
+              type="button"
+              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold"
+              onClick={() => {
+                setShowOtpPopup(false)
+                setRegistrationToken(null)
+                setOtp("")
+                setPassword("")
+                setPendingRegistration(null)
+                setFetchError(null)
+              }}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <div className="px-8 pt-8 pb-6 flex flex-col items-center">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2 w-full text-left">Verification</h2>
+              <p className="text-gray-600 mb-6 w-full text-left">OTP sent to <span className="underline-offset-2 text-blue-500">{formData.email}</span></p>
+              <form onSubmit={handleOtpSubmit} className="w-full">
                 <div className="mb-4">
                   <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
-                    OTP <span className="text-red-500">*</span>
+                    OTP
                   </label>
                   <Input
                     id="otp"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     required
-                    placeholder="Enter 6-digit OTP"
+                    placeholder="Enter OTP"
                   />
+                  <div className="flex justify-end mt-1">
+                    <button
+                      type="button"
+                      className="text-blue-500 text-sm hover:underline"
+                      // TODO: implement resend OTP logic if needed
+                      onClick={() => toast.info("Resend OTP feature not implemented")}
+                      tabIndex={-1}
+                    >
+                      Resend OTP
+                    </button>
+                  </div>
                 </div>
-                <div className="mb-6">
+                <div className="mb-6 relative">
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password <span className="text-red-500">*</span>
+                    Create Password
                   </label>
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="Enter your password"
+                    placeholder="Create Password"
                   />
-                </div>
-                <div className="flex justify-end gap-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowOtpPopup(false)
-                      setRegistrationToken(null)
-                      setOtp("")
-                      setPassword("")
-                      setPendingRegistration(null)
-                      setFetchError(null)
-                    }}
-                    className="px-5 py-2.5 rounded-md bg-red-500 text-white hover:bg-gray-300 font-medium text-sm transition-colors"
+                    className="absolute right-3 top-8 text-gray-400 hover:text-gray-700"
+                    tabIndex={-1}
+                    onClick={() => setShowPassword((prev) => !prev)}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={otpLoading}
-                    className="px-5 py-2.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
-                  >
-                    {otpLoading ? (
-                      <div className="flex items-center justify-center">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      </div>
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 12.414m0 0L9.172 8.172m4.242 4.242l4.243 4.243m-4.243-4.243L4.929 4.929" />
+                      </svg>
                     ) : (
-                      <div>Verify and Register</div>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.857-.67 1.664-1.17 2.4M15.535 15.535A5.978 5.978 0 0112 17c-3.314 0-6-2.686-6-6 0-.828.167-1.617.465-2.343" />
+                      </svg>
                     )}
                   </button>
                 </div>
+                <button
+                  type="submit"
+                  disabled={otpLoading}
+                  className="w-full bg-blue-600 text-white py-2 rounded-md font-medium text-base hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                >
+                  {otpLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <span>Start Onboarding</span>
+                  )}
+                </button>
               </form>
             </div>
           </div>

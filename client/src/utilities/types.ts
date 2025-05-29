@@ -56,7 +56,7 @@ export type FormData = {
   customDesignation: string
   ownerDetails: PersonDetails | null
   hrDetails: PersonDetails | null
-  numberOfEmployees : String | null | Number
+  numberOfEmployees : Number | string
 }
 
 export interface PendingRegistration {
