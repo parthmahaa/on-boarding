@@ -22,6 +22,7 @@ import WorkflowManagement from './Components/SidebarPages/WorkflowManagement';
 import OtherDetails from './Components/SidebarPages/OtherDetails';
 import CollectEmployee from './Components/Employees/CollectEmployee';
 import React, { useEffect, useState } from 'react';
+import LoaderRings from './utilities/Loader';
 
 function Layout() {
   return (
@@ -40,7 +41,7 @@ function NotFound() {
       <AlertTriangle className="w-16 h-16 text-yellow-500 mb-4" />
       <h2 className="text-3xl font-bold mb-2">404 - Page Not Found</h2>
       <p className="text-gray-500 mb-4">Sorry, the page you are looking for does not exist.</p>
-      <a href="/form" className="text-blue-600 hover:underline">Go to Home</a>
+      <a href="/" className="text-blue-600 hover:underline">Go to Home</a>
     </div>
   );
 }
@@ -76,11 +77,11 @@ const CollectEmployeeWrapper: React.FC = () => {
   }, [params]);
 
   if (verified === null) {
-    return <div className="text-center py-10">Verifying link...</div>;
+    return <div className="text-center py-10"><LoaderRings/></div>;
   }
   if (!verified) {
     return(
-      <div>
+      <div className='text-center text-2xl pt-5'>
         The link is invalid
       </div>
     );

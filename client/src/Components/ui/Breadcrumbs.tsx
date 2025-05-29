@@ -3,6 +3,8 @@ import { ChevronRight } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Breadcrumbs() {
+  
+  // uses route to diplay dashboard > next path
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
 
@@ -10,7 +12,7 @@ export default function Breadcrumbs() {
     <nav className="flex items-center text-sm">
       <ol className="flex items-center">
         <li>
-          <Link to="/dashboard" className="text-blue-600 hover:underline">
+          <Link to="/" className="text-blue-600 hover:underline">
             Dashboard
           </Link>
         </li>

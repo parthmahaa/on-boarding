@@ -104,39 +104,38 @@ export default function OnboardingForm() {
     }
   }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.designation])
 
-  // Fetch PendingRegistration when the popup is shown
-  // useEffect(() => {
-  //   if (showOtpPopup && registrationToken) {
-  //     const fetchPendingRegistration = async () => {
-  //       try {
-  //         console.log(`Fetching pending registration with token: ${registrationToken}`)
-  //         console.log(`API URL: ${API_URL}/companies/pending-registration/${registrationToken}`)
-  //         const response = await fetch(`${API_URL}/company/pending-registration/${registrationToken}`, {
-  //           method: "GET",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         })
-  //         if (!response.ok) {
-  //           throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`)
-  //         }
-  //         const result: ApiResponse = await response.json()
-  //         console.log("Pending registration response:", result)
-  //         if (result.error) {
-  //           throw new Error(result.message || "Failed to fetch pending registration")
-  //         }
-  //         setPendingRegistration(result.data as PendingRegistration)
-  //         setFetchError(null)
-  //       } catch (err: any) {
-  //         console.error("Error fetching pending registration:", err)
-  //         setFetchError(err.message || "Failed to load registration data")
-  //         toast.warn("Unable to load registration details. Please enter the OTP you received via email.")
-  //         // Do not close the popup; let the user enter the OTP manually
-  //       }
-  //     }
-  //     fetchPendingRegistration()
-  //   }
-  // }, [showOtpPopup, registrationToken])
+  useEffect(() => {
+    if (showOtpPopup && registrationToken) {
+      const fetchPendingRegistration = async () => {
+        try {
+          console.log(`Fetching pending registration with token: ${registrationToken}`)
+          console.log(`API URL: ${API_URL}/companies/pending-registration/${registrationToken}`)
+          const response = await fetch(`${API_URL}/company/pending-registration/${registrationToken}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`)
+          }
+          const result: ApiResponse = await response.json()
+          console.log("Pending registration response:", result)
+          if (result.error) {
+            throw new Error(result.message || "Failed to fetch pending registration")
+          }
+          setPendingRegistration(result.data as PendingRegistration)
+          setFetchError(null)
+        } catch (err: any) {
+          console.error("Error fetching pending registration:", err)
+          setFetchError(err.message || "Failed to load registration data")
+          toast.warn("Unable to load registration details. Please enter the OTP you received via email.")
+          // Do not close the popup; let the user enter the OTP manually
+        }
+      }
+      fetchPendingRegistration()
+    }
+  }, [showOtpPopup, registrationToken])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -291,6 +290,11 @@ export default function OnboardingForm() {
     }
   }
 
+  // Shared encryption utility (for demo; replace with real crypto for production)
+  function encrypt(data: any): string {
+    return btoa(encodeURIComponent(JSON.stringify(data)));
+  }
+
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!registrationToken) {
@@ -319,9 +323,26 @@ export default function OnboardingForm() {
         console.log(result.error);
         toast.error(result.message || "Failed to verify OTP")
       } else {
+        // --- Store encrypted details in localStorage ---
+        // Assume result.data contains company info (id, name) and user info (name, email, role)
+        // If not, fallback to formData for user info and registrationToken for company id
+        const companyDetails = {
+          id: result.data?.companyId || registrationToken, // fallback to token if no id
+          name: result.data?.companyName || formData.companyName,
+        }
+        const userDetails = {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+        }
+        const userRoles = [formData.designation === "OTHER" ? formData.customDesignation : formData.designation]
+        localStorage.setItem("userDetails", encrypt(userDetails))
+        localStorage.setItem("companyDetails", encrypt(companyDetails))
+        localStorage.setItem("userRoles", encrypt(userRoles))
+        // --- End store ---
+
         toast.success("Company registered successfully!")
         setShowOtpPopup(false)
-        navigate("/dashboard")
+        navigate("/")
       }
     } catch (err: any) {
       console.log(err.message);

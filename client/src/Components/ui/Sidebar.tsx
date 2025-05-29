@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: "Dashboard", icon: Home, path: "/dashboard" },
+  { name: "Dashboard", icon: Home, path: "/" },
   { name: "Company", icon: Building2, path: "/company" },
   { name: "Branch", icon: GitBranch, path: "/branch" },
   { name: "Import Employees", icon: Users, path: "/import-employees" },
@@ -24,15 +24,19 @@ interface SidebarProps {
     name: string;
     email: string;
   };
+  company : {
+    companyName : string,
+    companyId : string
+  }
   onLogout: () => void;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, company }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
   // Collapse sidebar if not on dashboard
-  const isCollapsed = pathname !== "/dashboard";
+  const isCollapsed = pathname !== "/";
 
   const handleNavigation = (path: string) => {
     window.location.href = path;
@@ -56,7 +60,7 @@ export function Sidebar({ user }: SidebarProps) {
               <text x="16" y="21" textAnchor="middle" fontSize="14" fill="currentColor" fontFamily="Arial">C</text>
             </svg>
             {!isCollapsed && (
-              <span className="font-bold text-blue-600 ml-2">Company Logo</span>
+              <span className="font-bold text-blue-600 ml-2">{company.companyName}</span>
             )}
           </span>
         </div>

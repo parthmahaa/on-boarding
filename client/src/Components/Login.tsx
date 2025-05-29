@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { API_URL } from '../services/api';
 import type { Employee,ApiResponse } from '../utilities/types';
 import { useNavigate } from 'react-router-dom';
+import { encrypt } from '../utilities/encrypt';
+import { toast } from 'react-toastify';
 
 // ---------- Login Component ----------
 const Login: React.FC<{}> = () => {
@@ -14,8 +16,8 @@ const Login: React.FC<{}> = () => {
 
   useEffect(() => {
     // Redirect to /home if already logged in
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      navigate('/home');
+    if (localStorage.getItem('token')) {
+      navigate('/');
     }
   }, [navigate]);
 
@@ -31,16 +33,33 @@ const Login: React.FC<{}> = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const response: ApiResponse= await res.json();
+      const response: ApiResponse = await res.json();
 
       if (response.error) {
         throw new Error(response.message || 'Invalid credentials.');
       }
 
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email);
-      navigate('/home')
+      // Store user details in localStorage for current session
+      // Adjust field names as per your API response structure
+      const userDetails = {
+        name: `${response.data?.firstName || ''} ${response.data?.lastName || ''}`.trim(),
+        email: response.data?.email || email,
+        phone: response.data?.phone || '',
+      };
+      const companyDetails = {
+        companyName : response.data?.companyName,
+        companyId : response.data?.companyId
+      }
+      const userRoles = response.data?.role || ''
+
+      localStorage.setItem('companyDetails', encrypt(companyDetails))
+      localStorage.setItem("userDetails" ,encrypt(userDetails))
+      localStorage.setItem("userRoles" ,encrypt(userRoles))
+      localStorage.setItem("token", "sdadasdasdasdadasd")
+      
+      navigate('/')
     } catch (err: any) {
+      toast.error(err.message)
       setError(err.message || 'Login failed.');
     } finally {
       setLoading(false);
@@ -75,7 +94,6 @@ const Login: React.FC<{}> = () => {
               required
             />
           </div>
-          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
           <button
             type="submit"
             disabled={loading}

@@ -196,7 +196,6 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
             const result = await response.json();
             if (response.ok) {
                 toast.success('Employee added successfully!');
-                // Reset form
                 setFormData({
                     id: '',
                     firstName: '',
@@ -506,7 +505,7 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                         >
                             <option value="">Select Employment Type</option>
-                            {employmentTypes.map((type) => (
+                            {employmentTypeOptions.map((type) => (
                                 <option key={type} value={type}>{type}</option>
                             ))}
                         </select>

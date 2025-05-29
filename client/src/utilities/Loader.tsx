@@ -4,6 +4,8 @@ import './Loader.css'; // Import the custom CSS file
 
 const LoaderRings = () => {
   return (
+    <div className="flex justify-center text-2xl">
+
     <svg className="pl w-24 h-24" viewBox="0 0 240 240">
       <circle
         className="pl__ring pl__ring--a"
@@ -16,7 +18,7 @@ const LoaderRings = () => {
         strokeDasharray="0 660"
         strokeDashoffset="-330"
         strokeLinecap="round"
-      ></circle>
+        ></circle>
       <circle
         className="pl__ring pl__ring--b"
         cx="120"
@@ -28,7 +30,7 @@ const LoaderRings = () => {
         strokeDasharray="0 220"
         strokeDashoffset="-110"
         strokeLinecap="round"
-      ></circle>
+        ></circle>
       <circle
         className="pl__ring pl__ring--c"
         cx="85"
@@ -39,7 +41,7 @@ const LoaderRings = () => {
         strokeWidth="20"
         strokeDasharray="0 440"
         strokeLinecap="round"
-      ></circle>
+        ></circle>
       <circle
         className="pl__ring pl__ring--d"
         cx="155"
@@ -50,8 +52,9 @@ const LoaderRings = () => {
         strokeWidth="20"
         strokeDasharray="0 440"
         strokeLinecap="round"
-      ></circle>
+        ></circle>
     </svg>
+        </div>
   );
 };
 
