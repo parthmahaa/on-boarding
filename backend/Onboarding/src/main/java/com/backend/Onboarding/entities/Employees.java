@@ -145,8 +145,31 @@ public class Employees {
         return companyName != null ? companyName : (company != null ? company.getCompanyName() : null);
     }
 
-    public void handleStatus(){
+    @PrePersist
+    @PreUpdate
+    private void prePersistOrUpdate() {
+        handleStatus();
+    }
 
+    public void handleStatus(){
+        boolean isValid = id != null && !id.isEmpty() &&
+                company != null &&
+                employeeFirstName != null && !employeeFirstName.isEmpty() &&
+                employeeLastName != null && !employeeLastName.isEmpty() &&
+                dateOfJoining != null &&
+                dateOfBirth != null &&
+                gender != null && !gender.isEmpty() &&
+                sbu != null && !sbu.isEmpty() &&
+                branch != null && !branch.isEmpty() &&
+                complianceBranch != null && !complianceBranch.isEmpty() &&
+                designation != null && !designation.isEmpty() &&
+                grade != null && !grade.isEmpty() &&
+                employeeType != null && !employeeType.isEmpty() &&
+                employmentType != null && !employmentType.isEmpty() &&
+                probationStatus != null && !probationStatus.isEmpty() &&
+                salaryOn != null && !salaryOn.isEmpty();
+
+        this.status = isValid ? "VALIDATED" : "ISSUES";
     }
 }
 
