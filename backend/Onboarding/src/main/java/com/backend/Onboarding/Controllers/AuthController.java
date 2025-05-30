@@ -33,6 +33,8 @@ public class AuthController {
             employeeDTO.setLastName(employee.getEmployeeLastName());
             employeeDTO.setEmail(employee.getEmployeeEmail());
             employeeDTO.setPhone(employee.getEmployeePhone());
+            employeeDTO.setCompanyName(employee.getCompanyName());
+            employeeDTO.setCompanyId(employee.getCompany().getCompanyId().toString());
             employeeDTO.setRoles(employee.getRoles().stream()
                     .map(Roles::getRoleName)
                     .collect(Collectors.toSet()));

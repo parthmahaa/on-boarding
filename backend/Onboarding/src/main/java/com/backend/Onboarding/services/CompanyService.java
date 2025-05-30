@@ -203,6 +203,7 @@ public class CompanyService {
             ownerEmployee.setEmployeeEmail(dto.getOwnerDetails().getEmail());
             ownerEmployee.setEmployeePhone(dto.getOwnerDetails().getPhone());
             ownerEmployee.setRoles(ownerRoles);
+            ownerEmployee.setRole("OWNER");
             // Generate and hash the password for the owner
             ownerRawPassword = PasswordGenerator.generateRandomPassword(12);
             ownerEmployee.setPassword(passwordEncoder.encode(ownerRawPassword));
@@ -226,6 +227,7 @@ public class CompanyService {
             hrEmployee.setEmployeeEmail(dto.getHrDetails().getEmail());
             hrEmployee.setEmployeePhone(dto.getHrDetails().getPhone());
             hrEmployee.setRoles(hrRoles);
+            hrEmployee.setRole("HR");
             // Generate and hash the password for HR
             hrRawPassword = PasswordGenerator.generateRandomPassword(12);
             hrEmployee.setPassword(passwordEncoder.encode(hrRawPassword));
@@ -241,8 +243,27 @@ public class CompanyService {
             }
         }
 
+        registeringEmployee.setRole(
+                registeringEmployeeRoles.stream().findFirst().map(Roles::getRoleName).orElse(null)
+        );
+
+        // For owner and HR (if present)
+        if (ownerEmployee != null) {
+            ownerEmployee.setRole(
+                    ownerEmployee.getRoles().stream().findFirst().map(Roles::getRoleName).orElse(null)
+            );
+        }
+        if (hrEmployee != null) {
+            hrEmployee.setRole(
+                    hrEmployee.getRoles().stream().findFirst().map(Roles::getRoleName).orElse(null)
+            );
+        }
+
+        System.out.println("Company save start");
         company = companyRepo.save(company);
+        System.out.println("Company saved, employee start");
         employeeRepo.save(registeringEmployee);
+
         if (ownerEmployee != null) employeeRepo.save(ownerEmployee);
         if (hrEmployee != null) employeeRepo.save(hrEmployee);
 
@@ -304,5 +325,19 @@ public class CompanyService {
         fetchedCompany.setCompanyName(company.getCompanyName());
 
         return fetchedCompany;
+    }
+
+    public CompanyBasicDTO getBasicCompanyDetails(UUID id) {
+        CompanyEntity company = companyRepo.findById(id).orElse(null);
+        if (company == null){
+            return null;
+        }
+
+        CompanyBasicDTO companyBasicDTO = new CompanyBasicDTO();
+        companyBasicDTO.setCompanyName(company.getCompanyName());
+        companyBasicDTO.setCompanyId(company.getCompanyId().toString());
+        companyBasicDTO.setPublicUrl(company.getPublicUrl());
+
+        return companyBasicDTO;
     }
 }

@@ -2,6 +2,7 @@ package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
 import com.backend.Onboarding.DTO.AddEmployeeDTO;
+import com.backend.Onboarding.DTO.ListEmployeesDTO;
 import com.backend.Onboarding.entities.Employees;
 import com.backend.Onboarding.services.EmployeeService;
 import jakarta.validation.Valid;
@@ -12,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -35,7 +38,6 @@ public class EmployeeController {
                     employee,
                     false
             );
-
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Company not found")) {
@@ -53,8 +55,8 @@ public class EmployeeController {
                         HttpStatus.BAD_REQUEST.value(),
                         "Invalid ID or format",
                         null,
-                        false
-                ),HttpStatus.BAD_REQUEST);
+                        true
+                ), HttpStatus.BAD_REQUEST);
             }
             if (e.getMessage().contains("already exists")) {
                 return new ResponseEntity<>(new ResponseWrapper<>(
@@ -62,63 +64,67 @@ public class EmployeeController {
                         HttpStatus.CONFLICT.value(),
                         "Already Exists:" + e.getMessage(),
                         null,
-                        false
-                ),HttpStatus.CONFLICT);
+                        true
+                ), HttpStatus.CONFLICT);
             }
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.BAD_REQUEST.value(),
-                    "Error",
+                    "Error:" +e.getMessage(),
                     null,
-                    false
-            ),HttpStatus.BAD_REQUEST);
+                    true
+            ), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "An error occurred while adding employee",
+                    "An error occurred while adding employee" + e.getMessage(),
                     null,
-                    false
-            ),HttpStatus.INTERNAL_SERVER_ERROR);
+                    true
+            ), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-//    @PutMapping("/admin/employees/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<ResponseWrapper<Employees>> updateEmployeeId(
-//            @PathVariable String id,
-//            @RequestBody UpdateEmployeeIdDTO updateDto) {
-//        try {
-//            Employees updatedEmployee = employeeService.updateEmployeeId(id, updateDto.getNewId());
-//            return ResponseEntity.ok(new ApiResponse<>(200, "Employee ID updated successfully", updatedEmployee, false));
-//        } catch (IllegalArgumentException e) {
-//            if (e.getMessage().contains("Employee not found")) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                        .body(new ApiResponse<>(404, "Employee not found", null, true));
-//            }
-//            if (e.getMessage().contains("already exists")) {
-//                return ResponseEntity.status(HttpStatus.CONFLICT)
-//                        .body(new ApiResponse<>(409, e.getMessage(), null, true));
-//            }
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(new ApiResponse<>(400, e.getMessage(), null, true));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(new ApiResponse<>(500, "An error occurred while updating employee ID", null, true));
-//        }
-//    }
+    @GetMapping(path = "/getEmployeeList/{id}")
+    public ResponseEntity<ResponseWrapper<List<ListEmployeesDTO>>> getEmpDetails(@PathVariable String id){
+        UUID companyId;
+        try {
+             companyId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID format for company ID: " + id);
+        }
 
+        try{
+            List<ListEmployeesDTO> employees = employeeService.getEmpDetails(companyId);
 
-}
+            if(employees == null){
+                throw new RuntimeException("No Employees found");
+            }
 
-class UpdateEmployeeIdDTO {
-    private String newId;
-
-    public String getNewId() {
-        return newId;
-    }
-
-    public void setNewId(String newId) {
-        this.newId = newId;
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Employees fetched",
+                    employees,
+                    false
+            ), HttpStatus.OK);
+        }catch (RuntimeException e){
+            if(e.getMessage().equals("Company not found")){
+                return new ResponseEntity<>(new ResponseWrapper<>(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        "Company Not Found",
+                        null,
+                        true
+                ), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.NOT_FOUND.value(),
+                    "An error Occured",
+                    null,
+                    true
+            ),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

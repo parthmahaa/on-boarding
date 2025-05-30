@@ -1,29 +1,37 @@
 package com.backend.Onboarding.services;
 
 import com.backend.Onboarding.DTO.AddEmployeeDTO;
+import com.backend.Onboarding.DTO.ListEmployeesDTO;
 import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.entities.Employees;
+import com.backend.Onboarding.entities.Manager;
 import com.backend.Onboarding.entities.Roles;
 import com.backend.Onboarding.repo.CompanyRepo;
 import com.backend.Onboarding.repo.EmployeeRepo;
+import com.backend.Onboarding.repo.ManagerRepo;
+import com.backend.Onboarding.repo.RolesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepo employeeRepo;
     private final CompanyRepo companyRepo;
+    private final ManagerRepo managerRepo;
+    private RolesRepo rolesRepo;
 
-    @Autowired
-    public EmployeeService(EmployeeRepo employeeRepo, CompanyRepo companyRepo) {
+    public EmployeeService(EmployeeRepo employeeRepo, CompanyRepo companyRepo, ManagerRepo managerRepo, RolesRepo rolesRepo) {
         this.employeeRepo = employeeRepo;
         this.companyRepo = companyRepo;
+        this.managerRepo = managerRepo;
+        this.rolesRepo = rolesRepo;
     }
 
     @Transactional
@@ -86,8 +94,10 @@ public class EmployeeService {
         employee.setSubDepartment(dto.getSubDepartment());
         employee.setCountOffDayInAttendance(dto.getCountOffDayInAttendance());
         employee.setCountHolidayInAttendance(dto.getCountHolidayInAttendance());
-        employee.setPrimaryManagerId(dto.getPrimaryManagerId());
-        employee.setSecondaryManagerId(dto.getSecondaryManagerId());
+        employee.setDepartment(dto.getDepartment());
+        employee.setPrimaryManager(validateAndGetManager(dto.getPrimaryManagerId()));
+        employee.setSecondaryManager(validateAndGetManager(dto.getSecondaryManagerId()));
+
         employee.setPaymentMethod(dto.getPaymentMethod());
         employee.setAadharNo(dto.getAadharNo());
         employee.setPanNo(dto.getPanNo());
@@ -98,6 +108,52 @@ public class EmployeeService {
 
         return savedEmployee;
     }
+
+    private Manager validateAndGetManager(String managerId) {
+        if (managerId == null || managerId.isEmpty()) {
+            return null;
+        }
+
+        // Check if a Manager entity already exists for this ID
+        Optional<Manager> existingManager = managerRepo.findById(managerId);
+        if (existingManager.isPresent()) {
+            return existingManager.get();
+        }
+
+        // Check if the employee with this ID exists
+        Optional<Employees> managerEmployeeOpt = employeeRepo.findById(managerId);
+        if (managerEmployeeOpt.isEmpty()) {
+            throw new IllegalArgumentException("Employee with ID " + managerId + " not found to assign as manager");
+        }
+
+        Employees managerEmployee = managerEmployeeOpt.get();
+
+        // Ensure the employee has the MANAGER role
+        Roles managerRole = rolesRepo.findByRoleName("MANAGER")
+                .orElseGet(() -> {
+                    Roles newRole = new Roles();
+                    newRole.setRoleName("MANAGER");
+                    return rolesRepo.save(newRole);
+                });
+        Set<Roles> employeeRoles = managerEmployee.getRoles();
+        if (employeeRoles == null) {
+            employeeRoles = new HashSet<>();
+            managerEmployee.setRoles(employeeRoles);
+        }
+        if (!employeeRoles.stream().anyMatch(role -> "MANAGER".equals(role.getRoleName()))) {
+            employeeRoles.add(managerRole);
+            employeeRepo.save(managerEmployee); // Update the employee with the new role
+        }
+
+        // Create a new Manager entity
+        Manager newManager = new Manager();
+        newManager.setId(managerId);
+        newManager.setFirstName(managerEmployee.getEmployeeFirstName());
+        newManager.setLastName(managerEmployee.getEmployeeLastName());
+        newManager.setCompany(managerEmployee.getCompany());
+        return managerRepo.save(newManager);
+    }
+
 
     @Transactional
     public Employees updateEmployeeId(String oldId, String newId) {
@@ -116,5 +172,58 @@ public class EmployeeService {
         // Update the ID
         employee.setId(newId);
         return employeeRepo.save(employee);
+    }
+
+    public List<ListEmployeesDTO> getEmpDetails(UUID id) {
+
+        CompanyEntity company = companyRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company not found with ID: " + id));
+
+
+
+        List<Employees> employees = company.getEmployees();
+
+        if(employees == null || employees.isEmpty()){
+            return List.of();
+        }
+
+        return employees.stream()
+                .map(this::mapToListEmpDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private ListEmployeesDTO mapToListEmpDTO(Employees employee) {
+        // Get manager details
+        Manager primaryManager = employee.getPrimaryManager();
+        Manager secondaryManager = employee.getSecondaryManager();
+
+        ListEmployeesDTO dto = new ListEmployeesDTO();
+        dto.setEmployeeId(employee.getId());
+        dto.setFullName(employee.getEmployeeFirstName() + " " + employee.getEmployeeLastName());
+        dto.setJoiningDate(employee.getDateOfJoining());
+        dto.setCreatedAt(employee.getCreatedAt());
+        dto.setEmail(employee.getEmployeeEmail());
+        dto.setSBU(employee.getSbu());
+        dto.setBranch(employee.getBranch());
+        dto.setDepartment(employee.getDepartment());
+        dto.setSubDepartment(employee.getSubDepartment());
+        dto.setDesignation(employee.getDesignation());
+        dto.setGrade(employee.getGrade());
+
+        if (primaryManager == null) {
+            dto.setPrimaryManager(null);
+        } else {
+            dto.setPrimaryManager(primaryManager.getFirstName() + " " + primaryManager.getLastName());
+        }
+        if (secondaryManager == null) {
+            dto.setSecondaryManager(null);
+        } else {
+            dto.setSecondaryManager(secondaryManager.getFirstName() + " " + secondaryManager.getLastName());
+        }
+
+        dto.setStatus(employee.getStatus());
+
+        return  dto;
     }
 }

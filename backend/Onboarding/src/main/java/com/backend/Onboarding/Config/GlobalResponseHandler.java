@@ -35,4 +35,17 @@ public class GlobalResponseHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResponseWrapper<Object>> handleArgumentException(IllegalArgumentException e){
+        String errorMessage = e.getMessage();
+        ResponseWrapper<Object> response = new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                errorMessage,
+                null,
+                true
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

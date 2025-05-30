@@ -1,6 +1,7 @@
 package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
+import com.backend.Onboarding.DTO.CompanyBasicDTO;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.PendingRegistration;
 import com.backend.Onboarding.services.CompanyService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/company")
@@ -37,10 +39,10 @@ public class CompanyController {
         } catch (IllegalArgumentException e) {
             ResponseWrapper<String> response = new ResponseWrapper<>(
                     LocalDateTime.now(),
-                    HttpStatus.OK.value(),
+                    HttpStatus.BAD_REQUEST.value(),
                     "Registration failed:" + e.getMessage(),
                     null,
-                    false
+                    true
             );
 
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -100,12 +102,39 @@ public class CompanyController {
         } catch (IllegalArgumentException e) {
             ResponseWrapper<String> response = new ResponseWrapper<>(
                     LocalDateTime.now(),
-                    HttpStatus.OK.value(),
+                    HttpStatus.BAD_REQUEST.value(),
                     "Registration Failed:"+ e.getMessage(),
                     null,
                     false
             );
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{companyId}")
+    public ResponseEntity<ResponseWrapper<CompanyBasicDTO>> getCompanyDetailsByCompanyId(@PathVariable String companyId) throws Exception {
+        UUID id = UUID.fromString(companyId);
+        try{
+            CompanyBasicDTO company = companyService.getBasicCompanyDetails(id);
+            if(company == null){
+                return new ResponseEntity<>(new ResponseWrapper<>(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        "Company Not Found",
+                        null,
+                        true
+                ),HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Company Found",
+                    company,
+                    false
+            ), HttpStatus.OK);
+        }catch (Exception e){
+           throw new Exception("Error:" + e.getMessage());
         }
     }
 }
