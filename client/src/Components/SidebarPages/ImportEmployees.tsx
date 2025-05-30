@@ -3,30 +3,33 @@ import {Plus} from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../services/api';
 import CollectEmployeePopup from './CollectEmployeePopup';
+import { decrypt } from '../../utilities/encrypt';
 
 const ImportEmployees: React.FC = () => {
     const navigate = useNavigate();
 
-    // Decrypt onboarding user from local storage
-    function decrypt(data: string) {
-        try {
-            return JSON.parse(decodeURIComponent(atob(data)));
-        } catch {
-            return null;
-        }
+    let userDetails : any = null
+    let companyDetails : any = null
+    try{
+        const userDetailsRaw = localStorage.getItem('userDetails')
+        userDetails = userDetailsRaw ? (decrypt(userDetailsRaw)) : null
+        const companyDetailsRaw = localStorage.getItem('companyDetails')
+        companyDetails = companyDetailsRaw ? (decrypt(companyDetailsRaw)) : null
+    }catch(e){
+        userDetails = null
+        companyDetails = null
     }
 
-    const companyDetailsRaw = localStorage.getItem('companyDetails');
-    const companyDetails = companyDetailsRaw ? decrypt(companyDetailsRaw) : null;
-    const companyId = companyDetails?.companyId;
-
-    console.log("Company ID:", companyId);
+    // Defensive check to avoid errors if companyDetails is null or malformed
+    const companyId = companyDetails && companyDetails.companyId ? companyDetails.companyId : '';
+    const companyName = companyDetails && companyDetails.companyName ? companyDetails.companyName : '';
 
     const handleAddEmp = () => {
         if (companyId) {
             navigate(`/addEmployee/${companyId}`);
+        } else {
+            alert('Company ID not found.');
         }
-        // Optionally handle the case where companyId is not available
     }
 
     const [showPopup, setShowPopup] = React.useState(false);

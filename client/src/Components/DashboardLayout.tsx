@@ -3,7 +3,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './ui/Breadcrumbs';
 import Sidebar from './ui/Sidebar';
 import Avatar from './ui/Avatar';
-import { Trophy } from 'lucide-react';
 import { decrypt } from '../utilities/encrypt';
 
 interface DashboardLayoutProps {
@@ -28,13 +27,14 @@ export default function DashboardLayout({ user, onLogout }: DashboardLayoutProps
     userDetails = userDetailsRaw ? (decrypt(userDetailsRaw)) : null
     const companyDetailsRaw = localStorage.getItem('companyDetails')
     companyDetails = companyDetailsRaw ? (decrypt(companyDetailsRaw)) : null
+
+    // console.log(userDetails);
+    // console.log(companyDetails);
   }catch(e){
     userDetails = null
     companyDetails = null
   }
 
-  console.log(userDetails);
-  console.log(companyDetails);
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}

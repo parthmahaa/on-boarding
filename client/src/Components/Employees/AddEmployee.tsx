@@ -246,30 +246,6 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-red-500 mb-6 text-left">Add New Employee</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Company Information (Prefilled)
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                        <input
-                            type="text"
-                            name="companyName"
-                            value={formData.companyName}
-                            readOnly
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-100"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Company ID</label>
-                        <input
-                            type="text"
-                            name="companyId"
-                            value={formData.companyId}
-                            readOnly
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 bg-gray-100"
-                        />
-                    </div>
-                </div> */}  
-                {/* Employee ID */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Employee ID (Optional)</label>
                     <input
@@ -698,7 +674,6 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                             name="panNo"
                             value={formData.panNo}
                             onChange={handleChange}
-                            // placeholder="e.g., ABCDE1234F"
                             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                         />
                     </div>

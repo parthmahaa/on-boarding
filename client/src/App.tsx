@@ -8,7 +8,6 @@ import Home from './Components/Home';
 import Navbar from './Components/Navbar';
 import { AlertTriangle, Lock } from 'lucide-react';
 import ViewEmployees from './Components/Admin/ViewEmployees';
-import ImportEmployees from './Components/SidebarPages/ImportEmployees';
 import DashboardLayout from './Components/DashboardLayout';
 import AddEmployee from './Components/Employees/AddEmployee';
 // Import all sidebar page components

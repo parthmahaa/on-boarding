@@ -335,6 +335,8 @@ export default function OnboardingForm() {
           email: formData.email,
         }
         const userRoles = [formData.designation === "OTHER" ? formData.customDesignation : formData.designation]
+        console.log(companyDetails);
+        console.log(userDetails);
         localStorage.setItem("userDetails", encrypt(userDetails))
         localStorage.setItem("companyDetails", encrypt(companyDetails))
         localStorage.setItem("userRoles", encrypt(userRoles))

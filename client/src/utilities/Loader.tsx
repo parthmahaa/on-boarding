@@ -1,6 +1,5 @@
 // components/LoaderRings.jsx
-import React from "react";
-import './Loader.css'; // Import the custom CSS file
+import './Loader.css';
 
 const LoaderRings = () => {
   return (
