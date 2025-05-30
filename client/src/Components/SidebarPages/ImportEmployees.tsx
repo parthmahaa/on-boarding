@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../services/api';
 import CollectEmployeePopup from './CollectEmployeePopup';
 import { decrypt } from '../../utilities/encrypt';
+import EmployeeTable from '../Employees/EmployeeList';
 
 const ImportEmployees: React.FC = () => {
     const navigate = useNavigate();
@@ -73,6 +74,9 @@ const ImportEmployees: React.FC = () => {
                     <Plus size={15} />
                     Collect Employees
                 </button>
+            </div>
+            <div className='pt-2'>
+                <EmployeeTable data={[]} companyId={companyId}/>
             </div>
             {showPopup && publicUrl && (
                 <CollectEmployeePopup url={publicUrl} onClose={() => setShowPopup(false)} />

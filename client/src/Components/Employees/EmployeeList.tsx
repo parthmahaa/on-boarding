@@ -1,50 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Table, TableHead, TableRow, TableCell, TableBody } from '../ui/Table';
 import { Input } from '../ui/Input';
 import { Pagination } from '../ui/Pagination';
 import AddEmployeeForm from './AddEmployee';
 import { Download, Filter } from 'lucide-react';
+import { API_URL } from '../../services/api';
+import type { ApiResponse } from '../../utilities/types';
+import { toast } from 'react-toastify';
 
-
+// Updated Employee interface to match API response and allow nulls
 interface Employee {
-  name: string;
+  fullName: string;
   id: string;
-  joiningDate: string;
-  createdDate: string;
+  joiningDate: string | null;
+  createdAt: string ;
   email: string;
-  sbu: string;
-  branch: string;
-  department: string;
-  designation: string;
-  primaryManager: string;
+  branch: string | null;
+  department: string 
+  subDepartment: string | null;
+  designation: string | null;
+  grade: string | null;
+  primaryManager: string | null;
+  secondaryManager: string | null;
+  status: string | null;
+  sbu: string | null;
+}
+
+// Format date as DD-MMM-YYYY
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
 }
 
 interface EmployeeTableProps {
-  data: Employee[];
+  data?: Employee[];
+  companyId?: string;
 }
 
 const validateEmployee = (employee: Employee): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const dateRegex = /^\d{2}-[A-Za-z]{3}-\d{4}$/;
+  const requiredFields = [
+    employee.fullName,
+    employee.email,
+    employee.joiningDate,
+    employee.sbu,
+    employee.branch,
+    employee.department,
+    employee.designation
+  ];
 
-  return (
-    employee.name !== '' &&
-    emailRegex.test(employee.email) &&
-    dateRegex.test(employee.joiningDate) &&
-    dateRegex.test(employee.createdDate) &&
-    employee.primaryManager !== ''
-  );
+  // Check all fields are non-empty strings (and not null/undefined)
+  return requiredFields.every(field => typeof field === 'string' && field.trim() !== '');
 };
 
-const EmployeeTable: React.FC<EmployeeTableProps> = ({ data }) => {
+
+const EmployeeTable: React.FC<EmployeeTableProps> = ({ data, companyId }) => {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [filter, setFilter] = useState<string>('');
   const [page, setPage] = useState<number>(1);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const recordsPerPage = 25;
-  const filteredData = data.filter((emp) =>
-    emp.name.toLowerCase().includes(filter.toLowerCase())
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch(`${API_URL}/employees/getEmployeeList/${companyId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: ApiResponse = await response.json();
+        setEmployees(result.data);
+        console.log(result.data);
+      } catch (err: any) {
+        toast.error(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if(companyId){
+      fetchEmployees()
+      setLoading(true)
+    }
+  }, [companyId, data]);
+
+  const recordsPerPage = 6;
+  const filteredData = employees.filter((emp) =>
+    emp.fullName.toLowerCase().includes(filter.toLowerCase())
   );
 
   const paginatedData = filteredData.slice(
@@ -53,15 +101,14 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data }) => {
   );
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <div className="space-x-2">
-          <Button onClick={() => setShowForm(true)}>+ Add Employee</Button>
+    <div className="">
+      <div className="flex justify-between items-center mb-1">
+        <div className="space-x-2 flex">
           <Button variant="outline">
-            <Download className="w-4 h-4 mr-1" /> Export
+            <Download className="w-4 h-2" /> Export
           </Button>
           <Button variant="outline">
-            <Filter className="w-4 h-4 mr-1" /> Filter
+            <Filter className="w-4 h-2" /> Filter
           </Button>
         </div>
         <Input
@@ -94,19 +141,26 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data }) => {
             return (
               <TableRow key={idx} className={!isValid ? 'bg-red-100' : ''}>
                 <TableCell>
-                  <div className="font-semibold">{emp.name}</div>
+                  <div className="font-semibold">{emp.fullName}</div>
                   <div className="text-sm text-gray-500">{emp.id}</div>
                 </TableCell>
                 <TableCell>
-                  <div>{emp.joiningDate}</div>
-                  <div className="text-sm text-gray-500">{emp.createdDate}</div>
+                  <div>{emp.joiningDate || '-'}</div>
+                  <div className="text-sm text-gray-500">{emp.createdAt || '-'}</div>
                 </TableCell>
-                <TableCell className={!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emp.email) ? 'text-red-600' : ''}>{emp.email}</TableCell>
-                <TableCell>{emp.sbu}</TableCell>
-                <TableCell>{emp.branch}</TableCell>
-                <TableCell>{emp.department}</TableCell>
-                <TableCell>{emp.designation}</TableCell>
-                <TableCell className={!emp.primaryManager ? 'text-red-600' : ''}>{emp.primaryManager}</TableCell>
+                <TableCell className={!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emp.email) ? 'text-red-600' : ''}>
+                  {emp.email}
+                </TableCell>
+                <TableCell>{emp.sbu || '-'}</TableCell>
+                <TableCell>{emp.branch || '-'}</TableCell>
+                <TableCell>{emp.department || '-'}</TableCell>
+                <TableCell>
+                  <div>{emp.designation || '-'}</div>
+                  <div className='text-gray-500 text-sm'>{emp.grade || '-'}</div>
+                </TableCell>
+                <TableCell className={!emp.primaryManager ? 'text-red-600' : ''}>
+                  {emp.primaryManager || '-'}
+                </TableCell>
                 <TableCell className={isValid ? 'text-green-600' : 'text-red-600'}>
                   {isValid ? 'Validated' : 'Issues'}
                 </TableCell>
@@ -116,7 +170,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data }) => {
         </TableBody>
       </Table>
 
-      <div className="mt-4">
+      <div className="pt-2 pr-2">
         <Pagination
           page={page}
           totalPages={Math.ceil(filteredData.length / recordsPerPage)}
@@ -126,5 +180,6 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data }) => {
     </div>
   );
 };
+
 
 export default EmployeeTable;

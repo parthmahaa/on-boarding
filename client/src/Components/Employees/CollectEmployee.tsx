@@ -189,7 +189,6 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer <admin-jwt-token>' // Replace with actual token
                 },
                 body: JSON.stringify(dataToSend)
             });
