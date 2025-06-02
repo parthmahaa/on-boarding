@@ -2,15 +2,18 @@ package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
 import com.backend.Onboarding.DTO.AddSbuDTO;
+import com.backend.Onboarding.DTO.UpdateSbuDTO;
 import com.backend.Onboarding.entities.SBU;
 import com.backend.Onboarding.services.SBUService;
 import jakarta.validation.Valid;
+import lombok.experimental.PackagePrivate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -89,5 +92,29 @@ public class SBUController {
                     false
             ), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PatchMapping(path ="/{id}")
+    public ResponseEntity<ResponseWrapper<UpdateSbuDTO>> editSbu(@PathVariable Long id, @RequestBody Map<String, Object> updates){
+        UpdateSbuDTO edittedSbu = sbuService.editSbu(id,updates);
+
+        if(edittedSbu == null){
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.NOT_FOUND.value(),
+                    "No SBU found",
+                    null,
+                    true
+            ),HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "SBU Updated",
+                    edittedSbu,
+                    false
+                    ),HttpStatus.OK);
+        }
+
     }
 }

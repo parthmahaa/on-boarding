@@ -18,6 +18,7 @@ public class AddSbuDTO {
     @NotNull(message = "Please provide short name")
     private String shortName;
 
+
     private String url;
 
     private String type;
@@ -26,8 +27,8 @@ public class AddSbuDTO {
 
     private String identificationNumber;
 
+    private String gstNumber;
     private String tanNumber;
-
     private String panNumber;
 
     // Address details

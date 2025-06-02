@@ -1,16 +1,23 @@
 package com.backend.Onboarding.services;
 
 import com.backend.Onboarding.DTO.AddSbuDTO;
+import com.backend.Onboarding.DTO.UpdateSbuDTO;
 import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.entities.HrEmails;
 import com.backend.Onboarding.entities.SBU;
 import com.backend.Onboarding.repo.CompanyRepo;
 import com.backend.Onboarding.repo.SBURepo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.PatchMapping;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SBUService {
@@ -74,5 +81,54 @@ public class SBUService {
 
         // Save the SBU (cascades to HrEmail due to CascadeType.ALL)
         return sbuRepo.save(sbu);
+    }
+
+    @Transactional
+    public UpdateSbuDTO editSbu(Long id, Map<String, Object> updates) {
+        boolean exists = sbuRepo.existsById(id);
+        if(exists){
+            try {
+                SBU sbuToEdit = sbuRepo.findById(id).orElseThrow(() -> new RuntimeException("SBU NOT FOUND"));
+                updates.forEach((field, value)->{
+                    Field fieldToUpdate = ReflectionUtils.findField(SBU.class,field);
+                    if(fieldToUpdate != null){
+                        fieldToUpdate.setAccessible(true);
+                        ReflectionUtils.setField(fieldToUpdate,sbuToEdit,value);
+                    }
+                });
+
+                SBU updatedSbu = sbuRepo.save(sbuToEdit);
+                return mapToUpdateSbuDTO(updatedSbu) ;
+            }catch (Exception e){
+                throw new RuntimeException("failed to update SBU"+ e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    public UpdateSbuDTO mapToUpdateSbuDTO(SBU sbu) {
+        UpdateSbuDTO dto = new UpdateSbuDTO();
+        dto.setCompanyLogo(sbu.getCompanyLogo());
+        dto.setName(sbu.getName());
+        dto.setShortName(sbu.getShortName());
+        dto.setUrl(sbu.getUrl());
+        dto.setType(sbu.getType());
+        dto.setRegistrationDate(sbu.getRegistrationDate());
+        dto.setPincode(sbu.getPincode());
+        dto.setCountry(sbu.getCountry());
+        dto.setState(sbu.getState());
+        dto.setCity(sbu.getCity());
+        dto.setPanNumber(sbu.getPanNumber());
+        dto.setTanNumber(sbu.getTanNumber())
+        ;
+        dto.setPhoneNumber(sbu.getPhoneNumber());
+        dto.setAddress(sbu.getAddress());
+        dto.setHrPhoneNumber(sbu.getHrPhoneNumber());
+        dto.setHrWhatsappPhoneNumber(sbu.getHrWhatsappPhoneNumber());
+        dto.setHrEmails(sbu.getHrEmails().stream()
+                .map(HrEmails::getEmail)
+                .collect(Collectors.toList()));
+        dto.setTicketUpdates(sbu.isTicketUpdates());
+        return dto;
     }
 }

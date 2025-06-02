@@ -1,27 +1,14 @@
-package com.backend.Onboarding.entities;
+package com.backend.Onboarding.DTO;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-@Entity
-@Table(name = "sbu")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SBU {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class UpdateSbuDTO {
 
     private String companyLogo;
 
@@ -39,11 +26,8 @@ public class SBU {
 
     private String identificationNumber;
 
-    @Column(name = "gst_number")
     private String gstNumber;
-
     private String tanNumber;
-
     private String panNumber;
 
     // Address details
@@ -64,15 +48,13 @@ public class SBU {
     private boolean employeeIdBySBU;
 
     private String empNoPrefix;
-    private int totalDigits;
+    private Integer totalDigits;
 
     private String hrPhoneNumber;
     private String hrWhatsappPhoneNumber;
 
-    // Relationship to HR emails (store emails only if employeeIdBySBU is true)
-    @OneToMany(mappedBy = "sbu", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<HrEmails> hrEmails = new ArrayList<>();
+    // List of HR emails
+    private List<String> hrEmails;
 
     private boolean ticketUpdates;
 
@@ -83,9 +65,4 @@ public class SBU {
     private String IFSCcode;
     private String bankAddress;
 
-    // Relationship to CompanyEntity
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JoinColumn(name = "company_id", nullable = false)
-    private CompanyEntity company;
 }
