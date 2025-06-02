@@ -30,8 +30,12 @@ public class SBUService {
         this.companyRepo = companyRepo;
     }
 
-    public List<SBU> getSBUListByCompanyId(UUID companyId){
-        return sbuRepo.findByCompanyCompanyId(companyId);
+    public List<UpdateSbuDTO> getSBUListByCompanyId(UUID companyId){
+         List<SBU> sbus = sbuRepo.findByCompanyCompanyId(companyId);
+
+         return sbus.stream()
+                 .map(this::mapToUpdateSbuDTO)
+                 .toList();
     }
 
     public SBU addSbu(AddSbuDTO dto){

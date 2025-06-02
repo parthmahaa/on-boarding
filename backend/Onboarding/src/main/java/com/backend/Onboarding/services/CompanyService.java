@@ -330,18 +330,13 @@ public class CompanyService {
         return fetchedCompany;
     }
 
-    public CompanyBasicDTO getBasicCompanyDetails(UUID id) {
+    public CompanyDetailsDTO getBasicCompanyDetails(UUID id) {
         CompanyEntity company = companyRepo.findById(id).orElse(null);
         if (company == null){
             return null;
         }
 
-        CompanyBasicDTO companyBasicDTO = new CompanyBasicDTO();
-        companyBasicDTO.setCompanyName(company.getCompanyName());
-        companyBasicDTO.setCompanyId(company.getCompanyId().toString());
-        companyBasicDTO.setPublicUrl(company.getPublicUrl());
-
-        return companyBasicDTO;
+        return mapToCompanyDTO(company);
     }
 
     public CompanyDetailsDTO editCompany(UUID companyId, Map<String, Object> updates) {

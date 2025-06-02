@@ -114,10 +114,10 @@ public class CompanyController {
     }
 
     @GetMapping("/{companyId}")
-    public ResponseEntity<ResponseWrapper<CompanyBasicDTO>> getCompanyDetailsByCompanyId(@PathVariable String companyId) throws Exception {
+    public ResponseEntity<ResponseWrapper<CompanyDetailsDTO>> getCompanyDetailsByCompanyId(@PathVariable String companyId) throws Exception {
         UUID id = UUID.fromString(companyId);
         try{
-            CompanyBasicDTO company = companyService.getBasicCompanyDetails(id);
+            CompanyDetailsDTO company = companyService.getBasicCompanyDetails(id);
             if(company == null){
                 return new ResponseEntity<>(new ResponseWrapper<>(
                         LocalDateTime.now(),

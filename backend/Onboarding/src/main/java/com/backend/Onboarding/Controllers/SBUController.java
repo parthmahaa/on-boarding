@@ -61,11 +61,11 @@ public class SBUController {
         }
     }
 
-    @GetMapping(path = "/getSbu")
-    public ResponseEntity<ResponseWrapper<List<SBU>>> getSbus(@PathVariable String id) {
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<ResponseWrapper<List<UpdateSbuDTO>>> getSbus(@PathVariable String id) {
         UUID companyId = UUID.fromString(id);
         try {
-            List<SBU> sbus = sbuService.getSBUListByCompanyId(companyId);
+            List<UpdateSbuDTO> sbus = sbuService.getSBUListByCompanyId(companyId);
             if (sbus == null) {
                 return new ResponseEntity<>(new ResponseWrapper<>(
                         LocalDateTime.now(),
