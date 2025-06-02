@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**", "/api/**", "/register", "/api/company/**", "/api/admin/**", "/api/employees/**" , "/api/auth/login").permitAll() // adjust paths as needed
+                        .requestMatchers("/public/**", "/api/**", "/register", "/api/company/**", "/api/admin/**", "/api/employees/**" , "/api/sbu/**", "/api/auth/login").permitAll() // adjust paths as needed
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults()); // or .httpBasic() for API
