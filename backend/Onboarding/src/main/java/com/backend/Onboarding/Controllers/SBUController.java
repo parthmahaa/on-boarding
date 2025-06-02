@@ -95,7 +95,7 @@ public class SBUController {
     }
 
     @PatchMapping(path ="/{id}")
-    public ResponseEntity<ResponseWrapper<UpdateSbuDTO>> editSbu(@PathVariable Long id, @RequestBody Map<String, Object> updates){
+    public ResponseEntity<ResponseWrapper<UpdateSbuDTO>> editSbu(@PathVariable Long id, @RequestBody UpdateSbuDTO updates){
         UpdateSbuDTO edittedSbu = sbuService.editSbu(id,updates);
 
             return new ResponseEntity<>(new ResponseWrapper<>(

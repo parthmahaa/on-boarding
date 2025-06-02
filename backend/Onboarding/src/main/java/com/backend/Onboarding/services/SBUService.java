@@ -9,13 +9,8 @@ import com.backend.Onboarding.repo.CompanyRepo;
 import com.backend.Onboarding.repo.SBURepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.PatchMapping;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -88,26 +83,43 @@ public class SBUService {
     }
 
     @Transactional
-    public UpdateSbuDTO editSbu(Long id, Map<String, Object> updates) {
-        boolean exists = sbuRepo.existsById(id);
-        if(exists){
-            try {
-                SBU sbuToEdit = sbuRepo.findById(id).orElseThrow(() -> new RuntimeException("SBU NOT FOUND"));
-                updates.forEach((field, value)->{
-                    Field fieldToUpdate = ReflectionUtils.findField(SBU.class,field);
-                    if(fieldToUpdate != null){
-                        fieldToUpdate.setAccessible(true);
-                        ReflectionUtils.setField(fieldToUpdate,sbuToEdit,value);
-                    }
-                });
+    public UpdateSbuDTO editSbu(Long id, UpdateSbuDTO updates) {
+        SBU sbuToEdit = sbuRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("SBU NOT FOUND"));
 
-                SBU updatedSbu = sbuRepo.save(sbuToEdit);
-                return mapToUpdateSbuDTO(updatedSbu) ;
-            }catch (Exception e){
-                throw new RuntimeException("failed to update SBU"+ e.getMessage());
-            }
-        }
-        return null;
+        if (updates.getCompanyLogo() != null) sbuToEdit.setCompanyLogo(updates.getCompanyLogo());
+        if (updates.getName() != null) sbuToEdit.setName(updates.getName());
+        if (updates.getShortName() != null) sbuToEdit.setShortName(updates.getShortName());
+        if (updates.getUrl() != null) sbuToEdit.setUrl(updates.getUrl());
+        if (updates.getType() != null) sbuToEdit.setType(updates.getType());
+        if (updates.getRegistrationDate() != null) sbuToEdit.setRegistrationDate(updates.getRegistrationDate());
+        if (updates.getIdentificationNumber() != null) sbuToEdit.setIdentificationNumber(updates.getIdentificationNumber());
+        if (updates.getTanNumber() != null) sbuToEdit.setTanNumber(updates.getTanNumber());
+        if (updates.getPanNumber() != null) sbuToEdit.setPanNumber(updates.getPanNumber());
+        if (updates.getPincode() != null) sbuToEdit.setPincode(updates.getPincode());
+        if (updates.getCountry() != null) sbuToEdit.setCountry(updates.getCountry());
+        if (updates.getState() != null) sbuToEdit.setState(updates.getState());
+        if (updates.getCity() != null) sbuToEdit.setCity(updates.getCity());
+        if (updates.getPhoneNumber() != null) sbuToEdit.setPhoneNumber(updates.getPhoneNumber());
+        if (updates.getAddress() != null) sbuToEdit.setAddress(updates.getAddress());
+        if (updates.getSalarySlipFormat() != null) sbuToEdit.setSalarySlipFormat(updates.getSalarySlipFormat());
+        if (updates.getEmpNoPrefix() != null) sbuToEdit.setEmpNoPrefix(updates.getEmpNoPrefix());
+        if (updates.getTotalDigits() != null) sbuToEdit.setTotalDigits(updates.getTotalDigits());
+        if (updates.getHrPhoneNumber() != null) sbuToEdit.setHrPhoneNumber(updates.getHrPhoneNumber());
+        if (updates.getHrWhatsappPhoneNumber() != null) sbuToEdit.setHrWhatsappPhoneNumber(updates.getHrWhatsappPhoneNumber());
+        if (updates.getTicketUpdates() != null) sbuToEdit.setTicketUpdates(updates.getTicketUpdates());
+        if (updates.getBankName() != null) sbuToEdit.setBankName(updates.getBankName());
+        if (updates.getAccountNumber() != null) sbuToEdit.setAccountNumber(updates.getAccountNumber());
+        if (updates.getBranchCode() != null) sbuToEdit.setBranchCode(updates.getBranchCode());
+        if (updates.getIFSCcode() != null) sbuToEdit.setIFSCcode(updates.getIFSCcode());
+        if (updates.getBankAddress() != null) sbuToEdit.setBankAddress(updates.getBankAddress());
+        if (updates.getGstNumber() != null) sbuToEdit.setGstNumber(updates.getGstNumber());
+        if (updates.getEmployeeIdBySBU() != null) sbuToEdit.setEmployeeIdBySBU(updates.getEmployeeIdBySBU());
+
+        // Handle hrEmails if needed (update logic as per your requirements)
+
+        SBU updatedSbu = sbuRepo.save(sbuToEdit);
+        return mapToUpdateSbuDTO(updatedSbu);
     }
 
     public UpdateSbuDTO mapToUpdateSbuDTO(SBU sbu) {

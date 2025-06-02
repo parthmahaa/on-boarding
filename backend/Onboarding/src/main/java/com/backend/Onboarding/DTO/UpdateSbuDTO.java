@@ -12,10 +12,8 @@ public class UpdateSbuDTO {
 
     private String companyLogo;
 
-    @NotNull(message = "Please provide company name")
     private String name;
 
-    @NotNull(message = "Please provide short name")
     private String shortName;
 
     private String url;
@@ -45,7 +43,7 @@ public class UpdateSbuDTO {
 
     // HR details
     private String salarySlipFormat;
-    private boolean employeeIdBySBU;
+    private Boolean employeeIdBySBU;
 
     private String empNoPrefix;
     private Integer totalDigits;
@@ -56,7 +54,7 @@ public class UpdateSbuDTO {
     // List of HR emails
     private List<String> hrEmails;
 
-    private boolean ticketUpdates;
+    private Boolean ticketUpdates;
 
     // Bank details
     private String bankName;
