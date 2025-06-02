@@ -7,6 +7,7 @@
     import lombok.AllArgsConstructor;
     import lombok.Data;
     import lombok.NoArgsConstructor;
+    import lombok.extern.apachecommons.CommonsLog;
     import org.hibernate.annotations.CreationTimestamp;
     import org.hibernate.annotations.UpdateTimestamp;
 
@@ -30,11 +31,29 @@
         @Column(name = "company_name", nullable = false, unique = true)
         private String companyName;
 
+        @Column(name = "logo")
+        private String logo;
+        
         @Column(name = "address")
         private String address;
 
+        @Column(name = "city")
+        private String city;
+
+        @Column(name = "country")
+        private String country;
+
+        @Column(name = "state")
+        private String state;
+
         @Column(name = "GST_Registeration_Number")
         private String gstRegisterationNumber;
+
+        @Column(name = "TAN_Number")
+        private String tanNumber;
+
+        @Column(name = "PAN_Number")
+        private String panNumber;
 
         @Column(name = "pincode", length = 6)
         private String pincode;
@@ -47,6 +66,12 @@
 
         @Column(nullable = false, unique = true)
         private String publicUrl;
+
+        @Column(name = "company_type")
+        private String type;
+
+        @Column(name = "identification_no")
+        private Long identificationNumber;
 
         @Enumerated(EnumType.STRING)
         @Column(name = "status")

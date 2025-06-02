@@ -2,6 +2,7 @@ package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
 import com.backend.Onboarding.DTO.CompanyBasicDTO;
+import com.backend.Onboarding.DTO.CompanyDetailsDTO;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.PendingRegistration;
 import com.backend.Onboarding.services.CompanyService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -136,6 +138,31 @@ public class CompanyController {
         }catch (Exception e){
            throw new Exception("Error:" + e.getMessage());
         }
+    }
+
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<ResponseWrapper<CompanyDetailsDTO>> editCompany(@PathVariable String id, @RequestBody Map<String, Object> updates){
+        UUID companyId = UUID.fromString(id);
+
+        CompanyDetailsDTO edittedCompany = companyService.editCompany(companyId, updates);
+
+        if(edittedCompany == null){
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.NOT_FOUND.value(),
+                    "NO Company Found",
+                    null,
+                    true
+            ),HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.OK.value(),
+                "Company Edited",
+                edittedCompany,
+                false
+        ), HttpStatus.OK);
     }
 }
 

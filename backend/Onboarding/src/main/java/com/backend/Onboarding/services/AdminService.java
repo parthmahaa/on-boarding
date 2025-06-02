@@ -1,7 +1,9 @@
 package com.backend.Onboarding.services;
 
 import ch.qos.logback.core.model.conditional.ElseModel;
-import com.backend.Onboarding.DTO.CompanyAdminDTO;
+import com.backend.Onboarding.DTO.CompanyDetailsDTO
+        ;
+import com.backend.Onboarding.DTO.CompanyDetailsDTO;
 import com.backend.Onboarding.DTO.EmployeeAdminDTO;
 import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.entities.Employees;
@@ -26,11 +28,11 @@ public class AdminService {
         this.employeeRepo = employeeRepo;
     }
 
-    public List<CompanyAdminDTO> getAllCompanies(boolean includeEmployees) {
+    public List<CompanyDetailsDTO> getAllCompanies(boolean includeEmployees) {
         List<CompanyEntity> companies = companyRepo.findAll();
         System.out.println("Found " + companies.size() + " companies");
         return companies.stream().map(company -> {
-            CompanyAdminDTO dto = new CompanyAdminDTO();
+            CompanyDetailsDTO dto = new CompanyDetailsDTO();
             dto.setId(company.getCompanyId());
             dto.setCompanyName(company.getCompanyName());
             dto.setGstRegistrationNumber(company.getGstRegisterationNumber());

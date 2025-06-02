@@ -1,6 +1,7 @@
 package com.backend.Onboarding.services;
 
 import com.backend.Onboarding.DTO.CompanyBasicDTO;
+import com.backend.Onboarding.DTO.CompanyDetailsDTO;
 import com.backend.Onboarding.DTO.CompanyRegisterationDTO;
 import com.backend.Onboarding.entities.*;
 import com.backend.Onboarding.repo.*;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -310,7 +313,7 @@ public class CompanyService {
             for (int i = 0; i < URL_LENGTH; i++) {
                 shortCode.append(BASE62_CHARS.charAt(random.nextInt(BASE62_CHARS.length())));
             }
-            isUnique = !companyRepo.findByPublicUrl(shortCode.toString()).isPresent();
+            isUnique = companyRepo.findByPublicUrl(shortCode.toString()).isEmpty();
         } while (!isUnique);
 
         return shortCode.toString();
@@ -339,5 +342,53 @@ public class CompanyService {
         companyBasicDTO.setPublicUrl(company.getPublicUrl());
 
         return companyBasicDTO;
+    }
+
+    public CompanyDetailsDTO editCompany(UUID companyId, Map<String, Object> updates) {
+        boolean exists = companyRepo.existsById(companyId);
+        if(exists){
+            try{
+                CompanyEntity companyToEdit = companyRepo.findById(companyId).orElseThrow(() ->  new RuntimeException("Company Not found"));
+
+                updates.forEach((field, value) ->{
+                    Field fieldToUpdate = ReflectionUtils.findField(CompanyEntity.class, field);
+                    if(fieldToUpdate != null){
+                        fieldToUpdate.setAccessible(true);
+                        ReflectionUtils.setField(fieldToUpdate,companyToEdit,value);
+                    }
+                });
+
+                CompanyEntity updatedCompany = companyRepo.save(companyToEdit);
+                return mapToCompanyDTO(updatedCompany);
+            }catch (Exception e){
+                throw new RuntimeException("Failed to Update:" +e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    public CompanyDetailsDTO mapToCompanyDTO(CompanyEntity company){
+        CompanyDetailsDTO dto = new CompanyDetailsDTO();
+        dto.setId(company.getCompanyId());
+        dto.setCompanyName(company.getCompanyName());
+        dto.setShortName(company.getShortName());
+        dto.setGstRegistrationNumber(company.getGstRegisterationNumber());
+        dto.setUrl(company.getPublicUrl());
+        dto.setType(company.getType());
+        dto.setRegistrationDate(company.getCreatedAt());
+        dto.setIdentificationNumber(company.getIdentificationNumber());
+        dto.setGstRegistrationNumber(company.getGstRegisterationNumber());
+        dto.setTanNumber(company.getTanNumber());
+        dto.setPanNumber(company.getPanNumber());
+        dto.setPincode(company.getPincode());
+        dto.setCity(company.getCity());
+        dto.setState(company.getState());
+        dto.setCountry(company.getCountry());
+        dto.setAddress(company.getAddress());
+        dto.setLogo(company.getLogo());
+        dto.setCompanyStatus(company.getStatus());
+
+        return dto;
     }
 }

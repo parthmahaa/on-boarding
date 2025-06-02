@@ -1,7 +1,7 @@
 package com.backend.Onboarding.Controllers;
 
 import com.backend.Onboarding.Config.ResponseWrapper;
-import com.backend.Onboarding.DTO.CompanyAdminDTO;
+import com.backend.Onboarding.DTO.CompanyDetailsDTO;
 import com.backend.Onboarding.DTO.EmployeeAdminDTO;
 import com.backend.Onboarding.services.AdminService;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,10 @@ public class AdminController {
     }
 
     @GetMapping("/getCompanies")
-    public ResponseEntity<ResponseWrapper<List<CompanyAdminDTO>>> getAllCompanies(@RequestParam(value = "includeEmployees" ,defaultValue = "false") boolean includeEmployees){
+    public ResponseEntity<ResponseWrapper<List<CompanyDetailsDTO>>> getAllCompanies(@RequestParam(value = "includeEmployees" ,defaultValue = "false") boolean includeEmployees){
         try{
-            List<CompanyAdminDTO> companies = adminService.getAllCompanies(includeEmployees);
-            ResponseWrapper<List<CompanyAdminDTO>> response = new ResponseWrapper<>(
+            List<CompanyDetailsDTO> companies = adminService.getAllCompanies(includeEmployees);
+            ResponseWrapper<List<CompanyDetailsDTO>> response = new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.OK.value(),
                     "Fetched Companies",

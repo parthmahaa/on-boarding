@@ -119,8 +119,13 @@ public class SBUService {
         dto.setState(sbu.getState());
         dto.setCity(sbu.getCity());
         dto.setPanNumber(sbu.getPanNumber());
-        dto.setTanNumber(sbu.getTanNumber())
-        ;
+        dto.setTanNumber(sbu.getTanNumber());
+        dto.setIdentificationNumber(sbu.getIdentificationNumber());
+        dto.setGstNumber(sbu.getGstNumber());
+        dto.setSalarySlipFormat(sbu.getSalarySlipFormat());
+        dto.setEmployeeIdBySBU(sbu.isEmployeeIdBySBU());
+        dto.setEmpNoPrefix(sbu.getEmpNoPrefix());
+        dto.setTotalDigits(sbu.getTotalDigits());
         dto.setPhoneNumber(sbu.getPhoneNumber());
         dto.setAddress(sbu.getAddress());
         dto.setHrPhoneNumber(sbu.getHrPhoneNumber());
@@ -129,6 +134,10 @@ public class SBUService {
                 .map(HrEmails::getEmail)
                 .collect(Collectors.toList()));
         dto.setTicketUpdates(sbu.isTicketUpdates());
+        dto.setBankName(sbu.getBankName());
+        dto.setAccountNumber(sbu.getAccountNumber());
+        dto.setBankAddress(sbu.getBankAddress());
+        dto.setIFSCcode(sbu.getIFSCcode());
         return dto;
     }
 }
