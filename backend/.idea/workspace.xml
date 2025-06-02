@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/SBUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/SBUController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/SBUService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/SBUService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/Employees/EmployeeList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/Employees/EmployeeList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Company.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Company.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/ui/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/ui/Sidebar.tsx" afterDir="false" />

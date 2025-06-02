@@ -41,6 +41,8 @@ public class Branch {
 
     private String ESICNumber;
 
+    private Boolean status;
+
     @Column(name = "payroll_branch")
     private Boolean isPayrollBranch;
 

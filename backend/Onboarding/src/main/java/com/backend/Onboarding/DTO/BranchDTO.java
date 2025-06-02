@@ -26,6 +26,8 @@ public class BranchDTO {
 
     private Boolean isPayrollBranch;
 
+    private Boolean status;
+
     //compliance details
     @JsonProperty("PTNumber")
     private String PTNumber;

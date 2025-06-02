@@ -6,11 +6,8 @@ import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.repo.BranchRepo;
 import com.backend.Onboarding.repo.CompanyRepo;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
+import java.util.List;import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -63,6 +60,7 @@ public class BranchService {
         if (updates.getPTNumber() != null) branchToEdit.setPTNumber(updates.getPTNumber());
         if (updates.getLWNumber() != null) branchToEdit.setLWNumber(updates.getLWNumber());
         if (updates.getESICNumber() != null) branchToEdit.setESICNumber(updates.getESICNumber());
+        if (updates.getStatus() != null) branchToEdit.setStatus(updates.getStatus());
 
         Branch editedBranch = branchRepo.save(branchToEdit);
         return mapToBranchDTO(editedBranch);
@@ -82,7 +80,7 @@ public class BranchService {
         branch.setPTNumber(dto.getPTNumber());
         branch.setLWNumber(dto.getLWNumber());
         branch.setESICNumber(dto.getESICNumber());
-
+        branch.setStatus(dto.getStatus() != null ? dto.getStatus() : true);
         return branch;
     }
 
@@ -100,6 +98,7 @@ public class BranchService {
         dto.setPTNumber(branch.getPTNumber());
         dto.setLWNumber(branch.getLWNumber());
         dto.setESICNumber(branch.getESICNumber());
+        dto.setStatus(branch.getStatus());
         return dto;
     }
 }
