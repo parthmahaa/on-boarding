@@ -33,7 +33,7 @@
 
         @Column(name = "logo")
         private String logo;
-        
+
         @Column(name = "address")
         private String address;
 
@@ -84,6 +84,10 @@
         @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
         @JsonManagedReference
         private List<SBU> sbus = new ArrayList<>();
+
+        @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonManagedReference
+        private List<Branch> branches = new ArrayList<>();
 
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)

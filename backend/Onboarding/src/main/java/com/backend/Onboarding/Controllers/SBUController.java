@@ -98,15 +98,6 @@ public class SBUController {
     public ResponseEntity<ResponseWrapper<UpdateSbuDTO>> editSbu(@PathVariable Long id, @RequestBody Map<String, Object> updates){
         UpdateSbuDTO edittedSbu = sbuService.editSbu(id,updates);
 
-        if(edittedSbu == null){
-            return new ResponseEntity<>(new ResponseWrapper<>(
-                    LocalDateTime.now(),
-                    HttpStatus.NOT_FOUND.value(),
-                    "No SBU found",
-                    null,
-                    true
-            ),HttpStatus.NOT_FOUND);
-        }else{
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.OK.value(),
@@ -114,7 +105,6 @@ public class SBUController {
                     edittedSbu,
                     false
                     ),HttpStatus.OK);
-        }
 
     }
 }

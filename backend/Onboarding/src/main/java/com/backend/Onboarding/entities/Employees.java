@@ -47,7 +47,9 @@ public class Employees {
     private String gender; // Mandatory
 
     @Column()
-    private String sbu; // Mandatory (Strategic Business Unit)
+    private String sbu;
+
+    // Mandatory (Strategic Business Unit)
 
     @Column()
     private String branch; // Mandatory

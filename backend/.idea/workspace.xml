@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/BranchController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Branch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/BranchRepo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/BranchService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/CompanyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/CompanyController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/SBUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/SBUController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/CompanyService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/SBUService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/SBUService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/BranchDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/BranchDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/UrlDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/Employees.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/Employees/EmployeeList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/Employees/EmployeeList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Company.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Company.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../client/src/Components/ui/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/ui/Sidebar.tsx" afterDir="false" />
