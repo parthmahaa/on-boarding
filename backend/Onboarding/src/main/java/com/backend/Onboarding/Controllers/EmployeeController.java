@@ -121,7 +121,7 @@ public class EmployeeController {
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.NOT_FOUND.value(),
-                    "An error Occured",
+                    "An error Occured:" +e.getMessage(),
                     null,
                     true
             ),HttpStatus.INTERNAL_SERVER_ERROR);

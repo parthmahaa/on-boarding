@@ -17,6 +17,9 @@ public class HolidayAllocationDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "year")
+    private Long year;
+
     @Column(name = "HolidayId")
     private Long holidayId;
 
