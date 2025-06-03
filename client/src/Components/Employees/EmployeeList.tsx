@@ -161,8 +161,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data, companyId }) => {
                 <TableCell className={!emp.primaryManager ? 'text-red-600' : ''}>
                   {emp.primaryManager || '-'}
                 </TableCell>
-                <TableCell className={isValid ? 'text-green-600' : 'text-red-600'}>
-                  {isValid ? 'Validated' : 'Issues'}
+                <TableCell className={emp.status === 'VALIDATED' ? 'text-green-600' : 'text-red-600'}>
+                  {emp.status}
                 </TableCell>
               </TableRow>
             );

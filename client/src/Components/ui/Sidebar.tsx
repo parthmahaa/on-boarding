@@ -65,12 +65,13 @@ export function Sidebar({ user, company }: SidebarProps) {
           </span>
         </div>
 
-        <nav className="flex flex-col p-2">
+        <nav className="flex flex-col p-">
           {navigation.map((item) => (
             <button
               key={item.name}
               onClick={() => handleNavigation(item.path)}
-              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 text-left transition-all duration-200 ${
+              //adjust padding to increase gap b/w items
+              className={`flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-left transition-all duration-200 ${
                 pathname === item.path ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-700'
               } ${isCollapsed ? 'justify-center' : ''}`}
             >

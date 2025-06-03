@@ -1,4 +1,4 @@
 package com.backend.Onboarding.DTO;
 
-public class EmailLogDTO {
+public class FilterDTO {
 }
