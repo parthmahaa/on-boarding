@@ -1,5 +1,6 @@
 package com.backend.Onboarding.services;
 
+import com.backend.Onboarding.Config.Exceptions.SmtpConfigNotFoundException;
 import com.backend.Onboarding.DTO.SMTPSetupDTO;
 import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.entities.SMTPConfiguration;
@@ -67,15 +68,23 @@ public class SMTPService {
             SMTPConfiguration smtp = smtpRepo.findByCompanyCompanyId(companyId)
                     .orElseThrow(() -> new IllegalArgumentException("SMTP config not found for company: " + companyId));
             return mapToSmtpDTO(smtp);
-        } catch (Exception e) {
+        }catch (SmtpConfigNotFoundException e){
+            throw new RuntimeException("SMTP Config not found");
+        }
+        catch (Exception e) {
             throw new RuntimeException("Failed to fetch SMTP service: " + e.getMessage(), e);
         }
     }
 
-    public SMTPSetupDTO updateService(UUID companyId, SMTPSetupDTO dto) {
-        try {
-            SMTPConfiguration smtp = smtpRepo.findByCompanyCompanyId(companyId)
-                    .orElseThrow(() -> new IllegalArgumentException("SMTP config not found for company: " + companyId));
+    public SMTPSetupDTO upsertService(SMTPSetupDTO dto) {
+        UUID companyId = UUID.fromString(dto.getCompanyId());
+        SMTPConfiguration smtp = smtpRepo.findByCompanyCompanyId(companyId).orElse(null);
+
+        if (smtp == null) {
+            // Create new
+            smtp = mapToSmtp(dto);
+        } else {
+            // Update existing
             smtp.setHrFromEmail(dto.getHrFromEmail());
             smtp.setHrUserName(dto.getHrUserName());
             smtp.setHrEmailPassword(dto.getHrEmailPassword());
@@ -84,11 +93,9 @@ public class SMTPService {
             smtp.setOfferEmailPassword(dto.getOfferEmailPassword());
             smtp.setSmtpServer(dto.getSmtpServer());
             smtp.setSmtpPort(dto.getSmtpPort());
-            SMTPConfiguration updated = smtpRepo.save(smtp);
-            return mapToSmtpDTO(updated);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update SMTP service: " + e.getMessage(), e);
         }
+        SMTPConfiguration saved = smtpRepo.save(smtp);
+        return mapToSmtpDTO(saved);
     }
 
 

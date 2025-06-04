@@ -1,5 +1,6 @@
 package com.backend.Onboarding.Config;
 
+import com.backend.Onboarding.Config.Exceptions.SmtpConfigNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -48,4 +49,17 @@ public class GlobalResponseHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(SmtpConfigNotFoundException.class)
+    public ResponseEntity<?> handleSmtpConfigNotFound(SmtpConfigNotFoundException ex) {
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "SMTP Config not found",
+                null,
+                true
+        ), HttpStatus.NOT_FOUND);
+    }
+
+
 }

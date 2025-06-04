@@ -24,11 +24,11 @@ public class ApprovalWorkflow {
     private CompanyEntity company;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "LoanApprovalWorkflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode loan;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "AttendanceRequestApprovalWorkFlow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode attendanceRequest;
 
     @Enumerated(EnumType.STRING)
@@ -36,11 +36,11 @@ public class ApprovalWorkflow {
     private ApprovalMode expenseClaimInAdvance;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "LeaveApprovealWorkFlow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode leaveAndCOff;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ShiftChangeRequestApprovalWorkflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode shiftChangeRequest;
 
     @Enumerated(EnumType.STRING)
@@ -56,22 +56,22 @@ public class ApprovalWorkflow {
     private ApprovalMode advance;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "AttendanceRegularizationApprovalWorkflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode attendanceRegularization;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ResignationRequestApprovalWorkflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode resignationRequest;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="ReimbExpenseClaim",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode expenseClaim;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "travel_expense_approval_workflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode pendingTravelExpense;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "travel_approval_workflow",nullable = false)
+    @Column(nullable = false)
     private ApprovalMode travel;
 }

@@ -57,15 +57,14 @@ public class SMTPController {
         ), HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateSmtpService(@PathVariable String id, @RequestBody SMTPSetupDTO dto) {
-        UUID companyId = UUID.fromString(id);
-        SMTPSetupDTO updated = smtpService.updateService(companyId, dto);
+    @PutMapping("/")
+    public ResponseEntity<?> upsertSmtpService(@RequestBody SMTPSetupDTO dto) {
+        SMTPSetupDTO result = smtpService.upsertService(dto);
         return new ResponseEntity<>(new ResponseWrapper<>(
                 LocalDateTime.now(),
                 HttpStatus.OK.value(),
-                "SMTP Service updated",
-                updated,
+                "SMTP Service created",
+                result,
                 false
         ), HttpStatus.OK);
     }

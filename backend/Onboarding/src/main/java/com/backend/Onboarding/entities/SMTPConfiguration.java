@@ -20,8 +20,7 @@ public class SMTPConfiguration {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false)
-    @JsonBackReference(value = "company-approval-workflows")
+    @JoinColumn(name = "company_id", nullable = false,unique = true)
     private CompanyEntity company;
 
     @Column(name = "hr_user_name")
