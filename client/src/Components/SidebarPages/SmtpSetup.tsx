@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import img1 from '../../assets/images/google.webp'
 import aws from '../../assets/images/aws.png'
@@ -8,12 +8,17 @@ import zoho from '../../assets/images/zoho.png'
 import aoi from '../../assets/images/aoi.png'
 import outlook from '../../assets/images/outloook.png'
 import ionos from '../../assets/images/ionos.png'
+import Loader from '../../utilities/Loader';
+import { decrypt } from '../../utilities/encrypt';
+import { toast } from 'react-toastify';
+import { API_URL } from '../../services/api';
+
 const PROVIDERS = [
   {
     name: 'Google',
     logo: (
       <img src={img1} className='w-full h-full object-contain' alt="Google logo" />
-    ),  
+    ),
     smtp: 'smtp.gmail.com',
     port: '587',
   },
@@ -97,6 +102,18 @@ const PROVIDERS = [
   },
 ];
 
+interface SmtpConfig {
+  companyId: string;
+  hrUserName: string;
+  hrEmailPassword: string;
+  hrFromEmail: string;
+  offerUserName: string;
+  offerEmailPassword: string;
+  offerFromEmail: string;
+  smtpServer: string;
+  smtpPort: string;
+}
+
 export default function EmailProviderForm() {
   // Form states
   const [hrUsername, setHrUsername] = useState('');
@@ -119,11 +136,65 @@ export default function EmailProviderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [resultMsg, setResultMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Computed fields for SMTP/Port
   const provider = PROVIDERS.find(p => p.name === selectedProvider);
   const smtpServer = provider?.name === 'Other Provider' ? customSmtp : provider?.smtp;
   const smtpPort = provider?.name === 'Other Provider' ? customPort : provider?.port;
+
+  let companyDetails: any = null
+  try {
+    const companyDetailsRaw = localStorage.getItem('companyDetails')
+    companyDetails = companyDetailsRaw ? (decrypt(companyDetailsRaw)) : null
+  } catch (e) {
+    companyDetails = null
+  }
+  const companyId = companyDetails && companyDetails.companyId ? companyDetails.companyId : '';
+
+
+  // Load SMTP configuration on mount
+  useEffect(() => {
+    const loadSmtpConfig = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/smtp/${companyId}`);
+        const data = await response.json();
+
+        // if (!data.data) {
+        //   toast.error('No data received from server');
+        //   return  ;
+        // }
+
+        // Update form states with the data
+        const smtpData = data.data;
+        setHrUsername(smtpData.hrUserName);
+        setHrPassword(smtpData.hrEmailPassword);
+        setFromEmailHR(smtpData.hrFromEmail);
+        setOfferUsername(smtpData.offerUserName);
+        setOfferPassword(smtpData.offerEmailPassword);
+        setFromEmailOffer(smtpData.offerFromEmail);
+
+        // Find and set provider based on SMTP server
+        const provider = PROVIDERS.find(p => p.smtp === smtpData.smtpServer);
+        if (provider) {
+          setSelectedProvider(provider.name);
+        } else {
+          setSelectedProvider('Other Provider');
+          setCustomSmtp(smtpData.smtpServer);
+          setCustomPort(smtpData.smtpPort);
+        }
+
+      } catch (err) {
+        console.error('Error loading configuration:', err);
+        // toast.error('Failed to load configuration');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSmtpConfig()    
+  }, [companyId]);
 
   // Handlers
   const handleProviderSelect = (name: string) => {
@@ -154,36 +225,72 @@ export default function EmailProviderForm() {
   const handleTestEmail = async () => {
     setIsTesting(true);
     setResultMsg('');
-    // dummy request
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_URL}/smtp/test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hrUserName: hrUsername,
+          hrEmailPassword: hrPassword,
+          hrFromEmail: fromEmailHR,
+          smtpServer,
+          smtpPort
+        })
+      });
+      const result = await response.json()
+
+      if(result.error){
+        console.log(result);
+        toast.error(result.message)
+      }else{
+        toast.success(result.message)
+      }
+      setResultMsg('Test email sent successfully!');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send test email');
+    } finally {
       setIsTesting(false);
-      setResultMsg('Test email sent (mock)!');
-    }, 800);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setResultMsg('');
-    // Simulate POST
+    setError(null);
+
     try {
-      const response = await fetch('/api/test', {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/smtp/`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          hrUsername, hrPassword, fromEmailHR, offerUsername, offerPassword, fromEmailOffer,
-          selectedProvider, smtpServer, smtpPort,
-        }),
+          companyId,
+          hrUserName: hrUsername,
+          hrEmailPassword: hrPassword,
+          hrFromEmail: fromEmailHR,
+          offerUserName: offerUsername,
+          offerEmailPassword: offerPassword,
+          offerFromEmail: fromEmailOffer,
+          smtpServer,
+          smtpPort
+        } as SmtpConfig)
       });
-      if (response.ok) {
-        setResultMsg('Configuration submitted (mock)!');
+
+      const result = await response.json();
+
+      if (result.error) {
+        toast.error(result.message);
       } else {
-        setResultMsg('Submission failed.');
+        toast.success(result.message);
+        setResultMsg('Configuration saved successfully!');
       }
-    } catch {
-      setResultMsg('Submission failed.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save configuration');
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   // Side effects for "same as..."
@@ -199,8 +306,12 @@ export default function EmailProviderForm() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (isLoading) {
+    return <Loader />
+  }
+
   return (
-    <form className="max-w-full mx-auto bg-gray-50 py-8 flex flex-col gap-6" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="max-w-full mx-auto bg-gray-50 py-8 flex flex-col gap-6">
       {/* Main form box */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -317,10 +428,10 @@ export default function EmailProviderForm() {
             <button type="button" key={p.name}
               className={`flex items-center justify-center w-full h-24 rounded border text-lg bg-white shadow-sm transition
                 ${selectedProvider === p.name
-                  ? 'border-blue-500 ring-2 ring-blue-200' 
+                  ? 'border-blue-500 ring-2 ring-blue-200'
                   : 'border-gray-200 hover:border-blue-400'} `}
               onClick={() => handleProviderSelect(p.name)}>
-                <div className="w-full h-full flex items-center justify-center">{p.logo}</div>
+              <div className="w-full h-full flex items-center justify-center">{p.logo}</div>
             </button>
           ))}
         </div>
@@ -366,9 +477,8 @@ export default function EmailProviderForm() {
           onClick={handleTestEmail} disabled={isTesting}>{isTesting ? 'Testing...' : 'Test Email'}</button>
         <button type="submit"
           className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow"
-          disabled={isSubmitting}>Submit</button>
+          disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Submit'}</button>
       </div>
-      {resultMsg && <div className="text-center text-blue-700 font-medium pt-2">{resultMsg}</div>}
     </form>
   );
 }
