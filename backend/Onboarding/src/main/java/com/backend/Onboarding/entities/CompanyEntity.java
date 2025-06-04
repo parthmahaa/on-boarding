@@ -89,6 +89,10 @@
         @JsonManagedReference
         private List<Branch> branches = new ArrayList<>();
 
+        @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonManagedReference(value = "company-approval-workflows")
+        private List<ApprovalWorkflow> approvalWorkflows = new ArrayList<>();
+
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm dd-MMM-yy")

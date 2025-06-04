@@ -127,4 +127,18 @@ public class EmployeeController {
             ),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    @PostMapping("/validate/excel")
+//    public ResponseEntity<?> validateExcelOfForEmployee(@RequestBody EmployeeCreationImportDTO employeeCreationImportDTO) {
+//        try {
+//            return CommonResponse.getData(importExcelService.validateExcelFileData(employeeService, EmployeeConstants.KEY_MAPPING_VALIDATE_EXCEL,
+//                    employeeCreationImportDTO.getFileName(), employeeCreationImportDTO.getFileContent(), new TypeReference<List<EmployeeCreationImportDTO>>() {
+//                    }, "EmployeeBankDetailImport"));
+//        } catch (AppException ae) {
+//            return CommonResponse.exception(ae.getMessage());
+//        } catch (Exception e) {
+//            return CommonResponse.somethingWentWrong(moduleName, e);
+//        }
+//    }
+
 }
