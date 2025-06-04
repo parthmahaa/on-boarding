@@ -11,18 +11,18 @@ import ViewEmployees from './Components/Admin/ViewEmployees';
 import DashboardLayout from './Components/DashboardLayout';
 import AddEmployee from './Components/Employees/AddEmployee';
 // Import all sidebar page components
-import Company from './Components/SidebarPages/Company';
+import Company from './Components/SidebarPages/Company/Company';
 import Branch from './Components/SidebarPages/Branch';
 import WorkSchedule from './Components/SidebarPages/WorkSchedule';
 import AttendancePolicy from './Components/SidebarPages/AttendancePolicy';
 import LeavePolicy from './Components/SidebarPages/LeavePolicy';
 import Holiday from './Components/SidebarPages/Holiday';
 import WorkflowManagement from './Components/SidebarPages/WorkflowManagement';
-import OtherDetails from './Components/SidebarPages/OtherDetails';
 import CollectEmployee from './Components/Employees/CollectEmployee';
 import React, { useEffect, useState } from 'react';
 import LoaderRings from './utilities/Loader';
 import ApprovalWorkflow from './Components/SidebarPages/ApprovalWorkflow';
+import SmtpSetup from './Components/SidebarPages/SmtpSetup';
 
 function Layout() {
   return (
@@ -136,6 +136,7 @@ function App() {
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/workflow-management" element={<WorkflowManagement />} />
             <Route path="/approval-workflow" element={<ApprovalWorkflow/>} />
+            <Route path="/smtp-setup" element={<SmtpSetup/>} />
           </Route>
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />

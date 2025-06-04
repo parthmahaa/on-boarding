@@ -44,7 +44,7 @@ export function Sidebar({ user, company }: SidebarProps) {
   };
 
   return (
-    <aside className={`min-h-screen bg-white border-r flex flex-col justify-between transition-all duration-200`}>
+    <aside className={`fixed min-h-screen bg-white border-r flex flex-col justify-between transition-all duration-200`}>
       <div>
         <div className={`flex items-center gap-2 p-4 border-b ${isCollapsed ? 'justify-center' : ''}`}>
           {/* Logo: show icon only when collapsed, icon+text when expanded */}

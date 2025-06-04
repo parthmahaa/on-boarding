@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { API_URL } from '../../services/api';
 import { decrypt } from '../../utilities/encrypt';
+import Loader from '../../utilities/Loader';
 
 interface WorkflowState {
   loan: string;
@@ -167,7 +168,7 @@ const ApprovalWorkflow = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader/>
   }
 
   return (

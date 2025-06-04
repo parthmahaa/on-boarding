@@ -8,6 +8,7 @@ import { Download, Filter } from 'lucide-react';
 import { API_URL } from '../../services/api';
 import type { ApiResponse } from '../../utilities/types';
 import { toast } from 'react-toastify';
+import Loader from '../../utilities/Loader';
 
 // Updated Employee interface to match API response and allow nulls
 interface Employee {
@@ -99,6 +100,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ data, companyId }) => {
     (page - 1) * recordsPerPage,
     page * recordsPerPage
   );
+
+  if(loading){
+    return <Loader/>
+  }
 
   return (
     <div className="">

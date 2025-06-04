@@ -34,7 +34,6 @@ export default function DashboardLayout({ user, onLogout }: DashboardLayoutProps
     userDetails = null
     companyDetails = null
   }
-
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}

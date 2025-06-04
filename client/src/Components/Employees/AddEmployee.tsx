@@ -242,7 +242,7 @@ const AddEmployeeForm: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <div className="max-w-full mx-auto bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-red-500 mb-6 text-left">Add New Employee</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
