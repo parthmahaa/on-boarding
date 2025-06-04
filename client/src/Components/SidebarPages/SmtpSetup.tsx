@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import img1 from '../../assets/images/google.webp'
+import aws from '../../assets/images/aws.png'
+import gsuite from '../../assets/images/gsuite.png'
+import sendgrid from '../../assets/images/sendgrid.png'
+import zoho from '../../assets/images/zoho.png'
+import aoi from '../../assets/images/aoi.png'
+import outlook from '../../assets/images/outloook.png'
+import ionos from '../../assets/images/ionos.png'
 const PROVIDERS = [
   {
     name: 'Google',
@@ -13,7 +20,10 @@ const PROVIDERS = [
   {
     name: 'AWS Mumbai',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="AWS Mumbai logo" />
+      <div className="flex items-center gap-2 w-full h-full justify-center">
+        <img src={aws} className='w-15 h-15 object-contain' alt="AWS Mumbai logo" />
+        <span className="text-xs font-semibold text-gray-600">Mumbai</span>
+      </div>
     ),
     smtp: 'email-smtp.ap-south-1.amazonaws.com',
     port: '587',
@@ -21,7 +31,10 @@ const PROVIDERS = [
   {
     name: 'AWS US-EAST-1',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="AWS US-EAST-1 logo" />
+      <div className="flex items-center gap-2 w-full h-full justify-center">
+        <img src={aws} className='w-15 h-15 object-contain' alt="AWS US-EAST-1 logo" />
+        <span className="text-xs font-semibold text-gray-600">US East</span>
+      </div>
     ),
     smtp: 'email-smtp.us-east-1.amazonaws.com',
     port: '587',
@@ -29,7 +42,7 @@ const PROVIDERS = [
   {
     name: 'Outlook',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="Outlook logo" />
+      <img src={outlook} className='w-full h-full object-contain' alt="Outlook logo" />
     ),
     smtp: 'smtp.office365.com',
     port: '587',
@@ -37,7 +50,7 @@ const PROVIDERS = [
   {
     name: 'IONOS',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="IONOS logo" />
+      <img src={ionos} className='w-full h-full object-contain' alt="IONOS logo" />
     ),
     smtp: 'smtp.ionos.com',
     port: '587',
@@ -45,7 +58,7 @@ const PROVIDERS = [
   {
     name: 'Aol.',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="AOL logo" />
+      <img src={aoi} className='w-full h-full object-contain' alt="AOL logo" />
     ),
     smtp: 'smtp.aol.com',
     port: '587',
@@ -53,7 +66,7 @@ const PROVIDERS = [
   {
     name: 'Zoho',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="Zoho logo" />
+      <img src={zoho} className='w-full h-20 object-contain' alt="Zoho logo" />
     ),
     smtp: 'smtp.zoho.com',
     port: '587',
@@ -61,7 +74,7 @@ const PROVIDERS = [
   {
     name: 'G Suite',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="G Suite logo" />
+      <img src={gsuite} className='w-full h-full object-contain' alt="G Suite logo" />
     ),
     smtp: 'smtp.gmail.com',
     port: '587',
@@ -69,7 +82,7 @@ const PROVIDERS = [
   {
     name: 'SendGrid',
     logo: (
-      <img src={img1} className='w-full h-full object-contain' alt="SendGrid logo" />
+      <img src={sendgrid} className='w-full h-full object-contain' alt="SendGrid logo" />
     ),
     smtp: 'smtp.sendgrid.net',
     port: '587',
@@ -86,13 +99,13 @@ const PROVIDERS = [
 
 export default function EmailProviderForm() {
   // Form states
-  const [hrUsername, setHrUsername] = useState('emgagehrms5@gmail.com');
+  const [hrUsername, setHrUsername] = useState('');
   const [hrPassword, setHrPassword] = useState('');
   const [showHrPassword, setShowHrPassword] = useState(false);
   const [fromEmailHR, setFromEmailHR] = useState('');
   const [fromEmailSameAsHr, setFromEmailSameAsHr] = useState(false);
 
-  const [offerUsername, setOfferUsername] = useState('emgagehrms5@gmail.com');
+  const [offerUsername, setOfferUsername] = useState('');
   const [offerPassword, setOfferPassword] = useState('');
   const [showOfferPassword, setShowOfferPassword] = useState(false);
   const [fromEmailOffer, setFromEmailOffer] = useState('');
@@ -122,12 +135,12 @@ export default function EmailProviderForm() {
   };
 
   const handleReset = () => {
-    setHrUsername('emgagehrms5@gmail.com');
+    setHrUsername('');
     setHrPassword('');
     setShowHrPassword(false);
     setFromEmailHR('');
     setFromEmailSameAsHr(false);
-    setOfferUsername('emgagehrms5@gmail.com');
+    setOfferUsername('');
     setOfferPassword('');
     setShowOfferPassword(false);
     setFromEmailOffer('');
@@ -233,7 +246,7 @@ export default function EmailProviderForm() {
               />
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="sameAsHr" checked={fromEmailSameAsHr} onChange={e => setFromEmailSameAsHr(e.target.checked)} />
-                <label htmlFor="sameAsHr" className="text-xs text-gray-600">same as HR username</label>
+                <label htmlFor="sameAsHr" className="text-xs text-gray-600">Same as HR username</label>
               </div>
             </div>
           </div>
@@ -280,7 +293,7 @@ export default function EmailProviderForm() {
               />
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="sameAsOffer" checked={fromEmailSameAsOffer} onChange={e => setFromEmailSameAsOffer(e.target.checked)} />
-                <label htmlFor="sameAsOffer" className="text-xs text-gray-600">same as offer username</label>
+                <label htmlFor="sameAsOffer" className="text-xs text-gray-600">Same as HR username</label>
               </div>
             </div>
           </div>
