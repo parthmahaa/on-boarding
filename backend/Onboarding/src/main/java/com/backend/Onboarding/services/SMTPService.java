@@ -26,6 +26,10 @@ public class SMTPService {
     }
 
     public SMTPSetupDTO saveService(SMTPSetupDTO dto) {
+        UUID companyId = UUID.fromString(dto.getCompanyId());
+        if (smtpRepo.findByCompanyCompanyId(companyId).isPresent()) {
+            throw new RuntimeException("SMTP configuration already exists for this company.");
+        }
         try {
             SMTPConfiguration smtp = mapToSmtp(dto);
             SMTPConfiguration saved = smtpRepo.save(smtp);
