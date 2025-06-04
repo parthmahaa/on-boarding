@@ -47,6 +47,38 @@ public class ApprovalWorkflowService {
         }
     }
 
+    public ApprovalWorkflowDTO updateApprovalWorkflow(UUID companyId, ApprovalWorkflowDTO dto) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+
+        ApprovalWorkflow workflow = approvalWorkflowRepo.findByCompanyId(companyId)
+                .orElse(null);
+
+        if (workflow == null) {
+            // Create new workflow
+            workflow = new ApprovalWorkflow();
+            workflow.setCompany(company);
+        }
+
+        workflow.setLoan(dto.getLoan());
+        workflow.setAttendanceRequest(dto.getAttendanceRequest());
+        workflow.setExpenseClaimInAdvance(dto.getExpenseClaimInAdvance());
+        workflow.setLeaveAndCOff(dto.getLeaveAndCOff());
+        workflow.setShiftChangeRequest(dto.getShiftChangeRequest());
+        workflow.setAssets(dto.getAssets());
+        workflow.setOverTimeApproval(dto.getOverTimeApproval());
+        workflow.setAdvance(dto.getAdvance());
+        workflow.setAttendanceRegularization(dto.getAttendanceRegularization());
+        workflow.setResignationRequest(dto.getResignationRequest());
+        workflow.setExpenseClaim(dto.getExpenseClaim());
+        workflow.setPendingTravelExpense(dto.getPendingTravelExpense());
+        workflow.setTravel(dto.getTravel());
+
+        ApprovalWorkflow savedWorkflow = approvalWorkflowRepo.save(workflow);
+        return mapToWorkflowDTO(savedWorkflow);
+    }
+
+
     //at the time of creation DTO-->Entity
     public ApprovalWorkflow mapToApprovalWorkflow(ApprovalWorkflowDTO dto){
         ApprovalWorkflow workflow = new ApprovalWorkflow();
@@ -91,4 +123,5 @@ public class ApprovalWorkflowService {
 
         return dto;
     }
+
 }

@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 public class ApprovalWorkflowDTO {
 
-    @NotBlank(message = "Company ID cannot be empty")
     private String companyId;
 
     @NotNull(message = "Loan approval mode is required")

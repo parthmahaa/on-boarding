@@ -3,12 +3,15 @@ package com.backend.Onboarding.Controllers;
 import com.backend.Onboarding.Config.ResponseWrapper;
 import com.backend.Onboarding.DTO.ApprovalWorkflowDTO;
 import com.backend.Onboarding.services.ApprovalWorkflowService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -57,5 +60,51 @@ public class ApprovalWorkflowController {
                 approvalWorkflow,
                 false
         ),HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateApprovalWorkflow(
+            @PathVariable  String id,
+            @Valid @RequestBody ApprovalWorkflowDTO dto) {
+        UUID companyId;
+        try {
+            companyId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid company ID format: " + id, e);
+        }
+        try {
+            ApprovalWorkflowDTO updatedWorkflow = approvalWorkflowService.updateApprovalWorkflow(companyId, dto);
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.OK.value(),
+                    "Approval workflow updated successfully",
+                    updatedWorkflow,
+                    false
+            ), HttpStatus.OK);
+        } catch (HttpMessageNotReadableException e) {
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    "JSON Parse Error: " + e.getMessage(),
+                    null,
+                    true
+            ), HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.NOT_FOUND.value(),
+                    e.getMessage(),
+                    null,
+                    true
+            ), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper<>(
+                    LocalDateTime.now(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "SERVER ERROR: " + e.getMessage(),
+                    null,
+                    true
+            ), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
