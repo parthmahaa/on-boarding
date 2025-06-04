@@ -3,7 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Home, Building2, GitBranch, Users, Clock, Calendar,
-  FileText, CalendarDays, Workflow, HelpCircle,
+  FileText, CalendarDays, Workflow, Mail, CheckSquare,
 } from 'lucide-react';
 
 const navigation = [
@@ -16,7 +16,8 @@ const navigation = [
   { name: "Leave Policy", icon: FileText, path: "/leave-policy" },
   { name: "Holiday", icon: CalendarDays, path: "/holiday" },
   { name: "Workflow Management", icon: Workflow, path: "/workflow-management" },
-  { name: "Other Details", icon: HelpCircle, path: "/other-details" },
+  { name: "SMTP Setup", icon: Mail, path: "/smtp-setup" },
+  { name: "Approval Workflow", icon: CheckSquare, path: "/approval-workflow" },
 ];
 
 interface SidebarProps {

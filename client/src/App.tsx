@@ -22,6 +22,7 @@ import OtherDetails from './Components/SidebarPages/OtherDetails';
 import CollectEmployee from './Components/Employees/CollectEmployee';
 import React, { useEffect, useState } from 'react';
 import LoaderRings from './utilities/Loader';
+import ApprovalWorkflow from './Components/SidebarPages/ApprovalWorkflow';
 
 function Layout() {
   return (
@@ -134,7 +135,7 @@ function App() {
             <Route path="/leave-policy" element={<LeavePolicy />} />
             <Route path="/holiday" element={<Holiday />} />
             <Route path="/workflow-management" element={<WorkflowManagement />} />
-            <Route path="/other-details" element={<OtherDetails />} />
+            <Route path="/approval-workflow" element={<ApprovalWorkflow/>} />
           </Route>
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />

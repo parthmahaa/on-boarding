@@ -59,7 +59,7 @@ const ImportEmployees: React.FC = () => {
 
     return (
         <>
-            <div className="flex justify-end gap-3 bg-white rounded-md">
+            <div className="flex justify-end gap-3 bg-gray-50 rounded-md">
                 <button onClick={handleAddEmp} className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
                     <Plus size={15} />
                     Add Employee
