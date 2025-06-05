@@ -19,8 +19,6 @@ import LeavePolicy from './Components/SidebarPages/LeavePolicy';
 import Holiday from './Components/SidebarPages/Holiday';
 import WorkflowManagement from './Components/SidebarPages/WorkflowManagement';
 import CollectEmployee from './Components/Employees/CollectEmployee';
-import React, { useEffect, useState } from 'react';
-import LoaderRings from './utilities/Loader';
 import ApprovalWorkflow from './Components/SidebarPages/ApprovalWorkflow';
 import SmtpSetup from './Components/SidebarPages/SmtpSetup';
 
@@ -57,38 +55,6 @@ function Unauthorized() {
   );
 }
 
-// Wrapper for /c/:params to verify path before rendering CollectEmployee
-const CollectEmployeeWrapper: React.FC = () => {
-  const { params } = useParams<{ params: string }>();
-  const [verified, setVerified] = useState<null | boolean>(null);
-
-  useEffect(() => {
-    const verify = async () => {
-      try {
-        const response = await fetch(`http://localhost:8080/api/${params}`);
-        const result = await response.json();
-        setVerified(response.ok && !result.error);
-      } catch {
-        setVerified(false);
-      }
-    };
-    if (params) verify();
-    else setVerified(false);
-  }, [params]);
-
-  if (verified === null) {
-    return <div className="text-center py-10"><LoaderRings/></div>;
-  }
-  if (!verified) {
-    return(
-      <div className='text-center text-2xl pt-5'>
-        The link is invalid
-      </div>
-    );
-  }
-  return <CollectEmployee />;
-};
-
 function App() {
   return (
     <>
@@ -107,8 +73,8 @@ function App() {
       />
       <Router>
         <Routes>
+          <Route path="/c/:params" element={<CollectEmployee/>} />
           <Route element={<Layout />}>
-            <Route path="/c/:params" element={<CollectEmployeeWrapper />} />
             <Route path="/form" element={<OnboardingForm />} />
           </Route>
           <Route path="/admin" element={<Admin />} />

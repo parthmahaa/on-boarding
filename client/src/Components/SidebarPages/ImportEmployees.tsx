@@ -37,17 +37,21 @@ const ImportEmployees: React.FC = () => {
     const [publicUrl, setPublicUrl] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
+    const [success, setSuccess] = React.useState(false);
 
     const handleCollectEmp = async () => {
         if (!companyId) return;
         setLoading(true);
         setError(null);
+        setSuccess(false);
         try {
             const res = await fetch(`${API_URL}/company/${companyId}`);
             if (!res.ok) throw new Error('Failed to fetch public URL');
             const result = await res.json();
             if(result.data?.publicUrl){
-                setPublicUrl("http://localhost:5173/c/"+result.data?.publicUrl);
+                const baseUrl = window.location.origin;
+                setPublicUrl(`${baseUrl}/c/${result.data.publicUrl}`);
+                setSuccess(true);
             }
             setShowPopup(true);
         } catch (err: any) {
@@ -55,6 +59,12 @@ const ImportEmployees: React.FC = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePopupClose = () => {
+        setShowPopup(false);
+        setPublicUrl(null);
+        setSuccess(false);
     };
 
     return (
@@ -79,10 +89,11 @@ const ImportEmployees: React.FC = () => {
                 <EmployeeTable data={[]} companyId={companyId}/>
             </div>
             {showPopup && publicUrl && (
-                <CollectEmployeePopup url={publicUrl} onClose={() => setShowPopup(false)} />
+                <CollectEmployeePopup 
+                    url={publicUrl} 
+                    onClose={handlePopupClose}
+                />
             )}
-            {loading && <div className="mt-2 text-blue-600">Loading...</div>}
-            {error && <div className="mt-2 text-red-500">{error}</div>}
         </>
     );
 };

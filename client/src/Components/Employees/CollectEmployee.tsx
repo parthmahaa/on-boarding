@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import type { EmployeeFormData } from '../../utilities/types';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from '../ui/DatePicker';
 import { API_URL } from '../../services/api';
+import { Switch } from '@headlessui/react';
 
 // Helper to format date as DD-MMM-YYYY
 function formatDate(date: Date | null): string {
@@ -44,10 +44,112 @@ type AddEmployeeFormProps = {
 };
 
 const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
-    const { companyId } = useParams<{ companyId: string }>();
+    const [companyDetails, setCompanyDetails] = useState<{
+        id: string;
+        name: string;
+        logo?: string;
+    } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // State for form fields
-    const [formData, setFormData] = useState<EmployeeFormData>({
+    // Add new state variables for API data
+    const [apiSbus, setApiSbus] = useState<string[]>([]);
+    const [apiBranches, setApiBranches] = useState<string[]>([]);
+    const [apiGrades, setApiGrades] = useState<string[]>([]);
+    const [apiDepartments, setApiDepartments] = useState<string[]>([]);
+    const [apiEmployees, setApiEmployees] = useState<{id: string, name: string}[]>([])
+
+    // Add state for custom input flags
+    const [useCustomSbu, setUseCustomSbu] = useState(false);
+    const [useCustomBranch, setUseCustomBranch] = useState(false);
+    const [useCustomDepartment, setUseCustomDepartment] = useState(false);
+    const [useCustomGrade, setUseCustomGrade] = useState(false);
+
+    const [showOptionalDetails, setShowOptionalDetails] = useState(false);
+
+    // First fetch company details using public URL
+    useEffect(() => {
+        const fetchCompanyDetails = async () => {
+            setIsLoading(true);
+            try {
+                const pathUrl = window.location.pathname;
+                const publicUrlParam = pathUrl.split('/c/')[1];
+                
+                if (!publicUrlParam) {
+                    throw new Error('Public URL not found');
+                }
+
+                const response = await fetch(`${API_URL}/${publicUrlParam}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch company details');
+                }
+
+                const data = await response.json();
+                if (!data.data) {
+                    throw new Error('Invalid company data');
+                }
+
+                setCompanyDetails({
+                    id: data.data.companyId,
+                    name: data.data.companyName,
+                    logo: data.data.logo
+                });
+
+                // Update form data with company details
+                setFormData(prev => ({
+                    ...prev,
+                    companyId: data.data.companyId,
+                    companyName: data.data.companyName
+                }));
+
+            } catch (error) {
+                console.error('Error fetching company details:', error);
+                toast.error('Error fetching company details');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCompanyDetails();
+    }, []);
+
+    // Modify existing data fetch to depend on company details
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!companyDetails?.id) return;
+
+            console.log(companyDetails);
+            
+            try {
+                const [
+                    employees,
+                    sbusRes,
+                    branchesRes,
+                    gradesRes,
+                    departmentsRes,
+                ] = await Promise.all([
+                    fetch(`${API_URL}/employees/names/${companyDetails.id}`).then(res => res.json()),
+                    fetch(`${API_URL}/sbu/${companyDetails.id}`).then(res => res.json()),
+                    fetch(`${API_URL}/branch/${companyDetails.id}`).then(res => res.json()),
+                    fetch(`${API_URL}/employees/grades/${companyDetails.id}`).then(res => res.json()),
+                    fetch(`${API_URL}/employees/departments/${companyDetails.id}`).then(res => res.json()),
+                ]);
+
+                setApiEmployees(employees || []);
+                setApiSbus(sbusRes.data?.map((s: any) => s.name) || []);
+                setApiBranches(branchesRes.data?.map((b: any) => b.branchName) || []);
+                setApiGrades(gradesRes || []);
+                setApiDepartments(departmentsRes || []);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                toast.error('Error fetching form data');
+            }
+        };
+
+        fetchData();
+    }, [companyDetails]);
+
+    // Define initial form state for resetting the form
+    const initialFormState: EmployeeFormData = {
         id: '',
         firstName: '',
         lastName: '',
@@ -58,7 +160,7 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         gender: '',
         sbu: initialData?.sbu || '',
         department: initialData?.department || '',
-        subDepartment: '', // <-- keep for type compatibility, but will not use in UI or logic
+        subDepartment: '',
         branch: '',
         complianceBranch: '',
         designation: '',
@@ -77,17 +179,14 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         paymentMethod: '',
         aadharNo: '',
         panNo: '',
-        companyId: companyId || '',
+        companyId: companyDetails?.id || '',
         companyName: '',
         ...initialData,
-    });
+    };
 
-    // State for dependent dropdown options
-    // Remove subDepartments state
-    // const [subDepartments, setSubDepartments] = useState<string[]>([]);
-    const [complianceBranches, setComplianceBranches] = useState<string[]>([]);
+    // State for form fields
+    const [formData, setFormData] = useState<EmployeeFormData>(initialFormState);
     const [employmentTypes, setEmploymentTypes] = useState<string[]>([]);
-
     // State for date pickers
     const [dateOfJoiningPicker, setDateOfJoiningPicker] = useState<Date | null>(null);
     const [dateOfBirthPicker, setDateOfBirthPicker] = useState<Date | null>(null);
@@ -95,37 +194,13 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     const [probationEndDatePicker, setProbationEndDatePicker] = useState<Date | null>(null);
     const [appraisalDatePicker, setAppraisalDatePicker] = useState<Date | null>(null);
 
-    // Predefined values
-    const departments = ['HR', 'IT', 'Finance & Accounting','Sales' ,'Marketing', 'Management', 'Operations' ,'Customer Support/ Service' ,'Legal' ,'Product / R&D' , 'Administration/Facilities','Excecutive Management', 'Procurement/Purchasing'];
-    const sbuOptions = ['SBU1', 'SBU2'];
-    const grades = ['G1', 'G2', 'G3', 'G4'];
-    const branches = ['HQ', 'Branch A', 'Branch B'];
-    const complianceBranchMap = {
-        'HQ': ['HQ Compliance'],
-        'Branch A': ['Branch A Compliance'],
-        'Branch B': ['Branch B Compliance']
-    };
-    const employeeTypeOptions = ['FULL_TIME', 'PART_TIME', 'CONTRACT'];
+    const employeeTypeOptions = ['FULL_TIME', 'PART_TIME'];
     const employmentTypeMap = {
         FULL_TIME: ['PERMANENT', 'PROBATION'],
-        PART_TIME: ['TEMPORARY'],
-        CONTRACT: ['FIXED_TERM']
+        PART_TIME: ['TEMPORARY','TRAINEE' , 'FREELANCER' ,'INTERN', 'CONSULTANT'],
     };
-    const employmentTypeOptions = ['PERMANENT', 'PROBATION', 'TEMPORARY', 'FIXED_TERM'];
     const probationStatuses = ['ON_PROBATION', 'COMPLETED', 'EXTENDED'];
-    const managers = ['MGR001', 'MGR002', 'MGR003'];
     const genders = ['MALE', 'FEMALE', 'OTHER'];
-
-    // Add salary type options
-    const salaryOnOptions = [
-        'Day',
-        'Hourly',
-        'Month',
-        'DWages',
-        'Stipend',
-        'Day-HO',
-        'WorkingDay'
-    ];
 
     useEffect(() => {
         // Sync pickers with formData (for reset)
@@ -148,16 +223,6 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
         }));
     };
 
-    // Update complianceBranch options when branch changes
-    useEffect(() => {
-        if (formData.branch) {
-            setComplianceBranches(complianceBranchMap[formData.branch as keyof typeof complianceBranchMap] || []);
-            setFormData((prev) => ({ ...prev, complianceBranch: complianceBranchMap[formData.branch as keyof typeof complianceBranchMap]?.[0] || '' }));
-        } else {
-            setComplianceBranches([]);
-        }
-    }, [formData.branch]);
-
     // Update employmentType options when employeeType changes
     useEffect(() => {
         if (formData.employeeType) {
@@ -171,9 +236,10 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Ensure all date fields are formatted
         const dataToSend = {
             ...formData,
+            complianceBranch: formData.branch,
+            companyId: companyDetails?.id,
             sbu: formData.sbu,
             department: formData.department,
             salaryOn: salaryOnUiToApi[formData.salaryOn] || formData.salaryOn,
@@ -183,526 +249,401 @@ const CollectEmployee: React.FC<AddEmployeeFormProps> = ({ initialData }) => {
             probationEndDate: formatDate(probationEndDatePicker),
             appraisalDate: formatDate(appraisalDatePicker),
         };
+
         try {
-            console.log(dataToSend);
-            const response = await fetch(`${API_URL}/employees/addEmployee`,{
+            const response = await fetch(`${API_URL}/employees/addEmployee`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(dataToSend)
             });
+
             const result = await response.json();
+
             if (response.ok) {
                 toast.success('Employee added successfully!');
-                setFormData({
-                    id: '',
-                    firstName: '',
-                    lastName: '',
-                    middleName: '',
-                    dateOfJoining: '',
-                    dateOfBirth: '',
-                    actualDateOfBirth: '',
-                    gender: '',
-                    sbu: '',
-                    department: '', // <-- Add this line
-                    subDepartment: '',
-                    branch: '',
-                    complianceBranch: '',
-                    designation: '',
-                    grade: '',
-                    employeeType: '',
-                    employmentType: '',
-                    probationStatus: '',
-                    salaryOn: '',
-                    officialEmail: '',
-                    probationEndDate: '',
-                    appraisalDate: '',
-                    countOffDayInAttendance: false,
-                    countHolidayInAttendance: false,
-                    primaryManagerId: '',
-                    secondaryManagerId: '',
-                    paymentMethod: '',
-                    aadharNo: '',
-                    panNo: '',
-                    companyId: formData.companyId ,
-                    companyName: formData.companyName,
-                });
+                // Reset form
+                setFormData(prevState => ({
+                    ...initialFormState,
+                    companyId: prevState.companyId,
+                    companyName: prevState.companyName,
+                }));
+                // Reset date pickers
                 setDateOfJoiningPicker(null);
                 setDateOfBirthPicker(null);
                 setActualDateOfBirthPicker(null);
                 setProbationEndDatePicker(null);
                 setAppraisalDatePicker(null);
             } else {
-                alert('Error: ' + result.message);
+                toast.error(result.message || 'Error adding employee');
             }
-        } catch (err : any) {
-            toast.error('Error submitting form: ');
+        } catch (err) {
+            toast.error('Error submitting form');
+            console.error('Error:', err);
         }
     };
 
+    if (isLoading) {
+        return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    }
+
+    if (!companyDetails) {
+        return <div className="flex items-center justify-center h-screen">Company not found</div>;
+    }
+
     return (
-        <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-red-500 text-left">{formData.companyName}</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Employee ID (Optional)</label>
-                    <input
-                        type="text"
-                        name="id"
-                        value={formData.id}
-                        onChange={handleChange}
-                        // placeholder="EMP001"
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    />
-                </div>
-
-                {/* Personal Information */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">First Name *</label>
-                        <input
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Middle Name</label>
-                        <input
-                            type="text"
-                            name="middleName"
-                            value={formData.middleName}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Last Name *</label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Date of Joining (DD-MMM-YYYY) *</label>
-                        <DatePicker
-                            selected={dateOfJoiningPicker}
-                            onChange={(date) => {
-                                setDateOfJoiningPicker(date);
-                                setFormData(prev => ({
-                                    ...prev,
-                                    dateOfJoining: formatDate(date)
-                                }));
-                            }}
-                            dateFormat="dd-MMM-yyyy"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Date of Birth (DD-MMM-YYYY) *</label>
-                        <DatePicker
-                            selected={dateOfBirthPicker}
-                            onChange={(date) => {
-                                setDateOfBirthPicker(date);
-                                setFormData(prev => ({
-                                    ...prev,
-                                    dateOfBirth: formatDate(date)
-                                }));
-                            }}
-                            dateFormat="dd-MMM-yyyy"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Actual Date of Birth (DD-MMM-YYYY)</label>
-                        <DatePicker
-                            selected={actualDateOfBirthPicker}
-                            onChange={(date) => {
-                                setActualDateOfBirthPicker(date);
-                                setFormData(prev => ({
-                                    ...prev,
-                                    actualDateOfBirth: formatDate(date)
-                                }));
-                            }}
-                            dateFormat="dd-MMM-yyyy"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Gender *</label>
-                    <select
-                        name="gender"
-                        value={formData.gender}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    >
-                        <option value="">Select Gender</option>
-                        {genders.map((gender) => (
-                            <option key={gender} value={gender}>{gender}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Department and SBU Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Department *</label>
-                        <select
-                            name="department"
-                            value={formData.department || ''}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Department</option>
-                            {departments.map((dept) => (
-                                <option key={dept} value={dept}>{dept}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">SBU *</label>
-                        <select
-                            name="sbu"
-                            value={formData.sbu || ''}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select SBU</option>
-                            {sbuOptions.map((sbu) => (
-                                <option key={sbu} value={sbu}>{sbu}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                {/* Sub Department as optional free-text input */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Sub Department (Optional)</label>
-                    <input
-                        type="text"
-                        name="subDepartment"
-                        value={formData.subDepartment}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        placeholder=""
-                    />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Branch *</label>
-                        <select
-                            name="branch"
-                            value={formData.branch}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Branch</option>
-                            {branches.map((branch) => (
-                                <option key={branch} value={branch}>{branch}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Compliance Branch *</label>
-                        <select
-                            name="complianceBranch"
-                            value={formData.complianceBranch}
-                            onChange={handleChange}
-                            disabled={!formData.branch}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Compliance Branch</option>
-                            {complianceBranches.map((compBranch) => (
-                                <option key={compBranch} value={compBranch}>{compBranch}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Designation *</label>
-                        <input
-                            type="text"
-                            name="designation"
-                            value={formData.designation}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Grade *</label>
-                        <select
-                            name="grade"
-                            value={formData.grade}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Grade</option>
-                            {grades.map((grade) => (
-                                <option key={grade} value={grade}>{grade}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Employment Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Employee Type *</label>
-                        <select
-                            name="employeeType"
-                            value={formData.employeeType}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Employee Type</option>
-                            {employeeTypeOptions.map((type) => (
-                                <option key={type} value={type}>{type}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Employment Type *</label>
-                        <select
-                            name="employmentType"
-                            value={formData.employmentType}
-                            onChange={handleChange}
-                            disabled={!formData.employeeType}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Employment Type</option>
-                            {employmentTypeOptions.map((type) => (
-                                <option key={type} value={type}>{type}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Probation Status *</label>
-                    <select
-                        name="probationStatus"
-                        value={formData.probationStatus}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    >
-                        <option value="">Select Probation Status</option>
-                        {probationStatuses.map((status) => (
-                            <option key={status} value={status}>{status}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Probation End Date (DD-MMM-YYYY)</label>
-                        <DatePicker
-                            selected={probationEndDatePicker}
-                            onChange={(date) => {
-                                setProbationEndDatePicker(date);
-                                setFormData(prev => ({
-                                    ...prev,
-                                    probationEndDate: formatDate(date)
-                                }));
-                            }}
-                            dateFormat="dd-MMM-yyyy"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Appraisal Date (DD-MMM-YYYY)</label>
-                        <DatePicker
-                            selected={appraisalDatePicker}
-                            onChange={(date) => {
-                                setAppraisalDatePicker(date);
-                                setFormData(prev => ({
-                                    ...prev,
-                                    appraisalDate: formatDate(date)
-                                }));
-                            }}
-                            dateFormat="dd-MMM-yyyy"
-                            showYearDropdown
-                            showMonthDropdown
-                            dropdownMode="select"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Salary Type *</label>
-                        <select
-                            name="salaryOn"
-                            value={formData.salaryOn}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Salary Type</option>
-                            {salaryOnOptions.map((type) => (
-                                <option key={type} value={type}>{type}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Manager Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Primary Manager</label>
-                        <select
-                            name="primaryManagerId"
-                            value={formData.primaryManagerId}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Primary Manager</option>
-                            {managers.map((manager) => (
-                                <option key={manager} value={manager}>{manager}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Secondary Manager</label>
-                        <select
-                            name="secondaryManagerId"
-                            value={formData.secondaryManagerId}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        >
-                            <option value="">Select Secondary Manager</option>
-                            {managers.map((manager) => (
-                                <option key={manager} value={manager}>{manager}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Additional Information */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Official Email</label>
-                    <input
-                        type="email"
-                        name="officialEmail"
-                        value={formData.officialEmail}
-                        onChange={handleChange}
-                        // placeholder="e.g., john.doe@company.com"
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="countOffDayInAttendance"
-                                checked={formData.countOffDayInAttendance}
-                                onChange={handleChange}
-                                className="mr-2"
+        <div className="min-h-screen bg-gray-50 py-8 px-4">
+            <div className="max-w-5xl mx-auto">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-8">
+                    <div className="flex items-center space-x-4">
+                        {companyDetails?.logo && (
+                            <img 
+                                src={companyDetails.logo} 
+                                alt="Company Logo" 
+                                className="h-12 w-auto"
                             />
-                            <span className="text-sm text-gray-700">Count Off Day in Attendance</span>
-                        </label>
+                        )}
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            {companyDetails?.name || 'DevX Accelerating Innovation'}
+                        </h1>
                     </div>
-                    <div>
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="countHolidayInAttendance"
-                                checked={formData.countHolidayInAttendance}
-                                onChange={handleChange}
-                                className="mr-2"
-                            />
-                            <span className="text-sm text-gray-700">Count Holiday in Attendance</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Aadhar No</label>
-                        <input
-                            type="text"
-                            name="aadharNo"
-                            value={formData.aadharNo}
-                            onChange={handleChange}
-                            // placeholder="12 digits"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">PAN No</label>
-                        <input
-                            type="text"
-                            name="panNo"
-                            value={formData.panNo}
-                            onChange={handleChange}
-                            // placeholder="e.g., ABCDE1234F"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        />
+                    <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600">Optional Details</span>
+                        <Switch
+                            checked={showOptionalDetails}
+                            onChange={setShowOptionalDetails}
+                            className={`${
+                                showOptionalDetails ? 'bg-blue-600' : 'bg-gray-200'
+                            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                        >
+                            <span className={`${
+                                showOptionalDetails ? 'translate-x-6' : 'translate-x-1'
+                            } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
+                        </Switch>
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Payment Method</label>
-                    <input
-                        type="text"
-                        name="paymentMethod"
-                        value={formData.paymentMethod}
-                        onChange={handleChange}
-                        // placeholder="e.g., BANK_TRANSFER"
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                    />
-                </div>
+                {/* Subtitle */}
+                <h2 className="text-xl text-gray-600 mb-8 text-center">
+                    Please fill in your details to help us set you up in the system
+                </h2>
 
-                {/* Submit Button */}
-                <div className="text-center">
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-                    >
-                        Add Employee
-                    </button>
-                </div>
-            </form>
+                {/* Main Form */}
+                <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8">
+                    {/* Form Sections */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Personal Details Section */}
+                        <div className="space-y-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-6">Personal Details</h3>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        First Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Middle Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="middleName"
+                                        value={formData.middleName}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Last Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Date of Birth (as per document) <span className="text-red-500">*</span>
+                                    </label>
+                                    <DatePicker
+                                        selected={dateOfBirthPicker}
+                                        onChange={(date) => {
+                                            setDateOfBirthPicker(date);
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                dateOfBirth: formatDate(date)
+                                            }));
+                                        }}
+                                        dateFormat="dd-MMM-yyyy"
+                                        showYearDropdown
+                                        showMonthDropdown
+                                        dropdownMode="select"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                {showOptionalDetails && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Date of Birth (Actual)
+                                        </label>
+                                        <DatePicker
+                                            selected={actualDateOfBirthPicker}
+                                            onChange={(date) => {
+                                                setActualDateOfBirthPicker(date);
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    actualDateOfBirth: formatDate(date)
+                                                }));
+                                            }}
+                                            dateFormat="dd-MMM-yyyy"
+                                            showYearDropdown
+                                            showMonthDropdown
+                                            dropdownMode="select"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Gender <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        name="gender"
+                                        value={formData.gender}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    >
+                                        <option value="">Select Gender</option>
+                                        {genders.map((gender) => (
+                                            <option key={gender} value={gender}>{gender}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Employment Details Section */}
+                        <div className="space-y-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-6">Employment Details</h3>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Employee ID
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="id"
+                                        value={formData.id}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Date of Joining <span className="text-red-500">*</span>
+                                    </label>
+                                    <DatePicker
+                                        selected={dateOfJoiningPicker}
+                                        onChange={(date) => {
+                                            setDateOfJoiningPicker(date);
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                dateOfJoining: formatDate(date)
+                                            }));
+                                        }}
+                                        dateFormat="dd-MMM-yyyy"
+                                        showYearDropdown
+                                        showMonthDropdown
+                                        dropdownMode="select"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        SBU <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex gap-2">
+                                        {useCustomSbu ? (
+                                            <input
+                                                type="text"
+                                                name="sbu"
+                                                value={formData.sbu}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            />
+                                        ) : (
+                                            <select
+                                                name="sbu"
+                                                value={formData.sbu}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            >
+                                                <option value="">Select SBU</option>
+                                                {apiSbus.map((sbu) => (
+                                                    <option key={sbu} value={sbu}>{sbu}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setUseCustomSbu(!useCustomSbu)}
+                                            className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                        >
+                                            {useCustomSbu ? 'Use List' : 'Custom'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Branch <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex gap-2">
+                                        {useCustomBranch ? (
+                                            <input
+                                                type="text"
+                                                name="branch"
+                                                value={formData.branch}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            />
+                                        ) : (
+                                            <select
+                                                name="branch"
+                                                value={formData.branch}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            >
+                                                <option value="">Select Branch</option>
+                                                {apiBranches.map((branch) => (
+                                                    <option key={branch} value={branch}>{branch}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setUseCustomBranch(!useCustomBranch)}
+                                            className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                        >
+                                            {useCustomBranch ? 'Use List' : 'Custom'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {showOptionalDetails && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Department <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="flex gap-2">
+                                                {useCustomDepartment ? (
+                                                    <input
+                                                        type="text"
+                                                        name="department"
+                                                        value={formData.department}
+                                                        onChange={handleChange}
+                                                        required
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    />
+                                                ) : (
+                                                    <select
+                                                        name="department"
+                                                        value={formData.department}
+                                                        onChange={handleChange}
+                                                        required
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                        <option value="">Select Department</option>
+                                                        {apiDepartments.map((dept) => (
+                                                            <option key={dept} value={dept}>{dept}</option>
+                                                        ))}
+                                                    </select>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setUseCustomDepartment(!useCustomDepartment)}
+                                                    className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                                >
+                                                    {useCustomDepartment ? 'Use List' : 'Custom'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Sub Department
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="subDepartment"
+                                                value={formData.subDepartment}
+                                                onChange={handleChange}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Designation <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="designation"
+                                                value={formData.designation}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            type="submit"
+                            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        >
+                            Add Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };
