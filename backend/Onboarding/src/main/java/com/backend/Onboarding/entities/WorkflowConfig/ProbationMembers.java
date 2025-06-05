@@ -12,8 +12,8 @@ public class ProbationMembers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type; // e.g., "branch", "employee", etc.
-    private String values; // Comma-separated values, e.g., "Branch A,Branch B"
+    private String type;
+    private String values;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workflow_config_id", nullable = false)

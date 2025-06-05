@@ -1,5 +1,6 @@
     package com.backend.Onboarding.entities;
 
+    import com.backend.Onboarding.entities.WorkflowConfig.WorkflowConfiguration;
     import com.backend.Onboarding.utilities.CompanyStatus;
     import com.fasterxml.jackson.annotation.JsonFormat;
     import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -7,7 +8,6 @@
     import lombok.AllArgsConstructor;
     import lombok.Data;
     import lombok.NoArgsConstructor;
-    import lombok.extern.apachecommons.CommonsLog;
     import org.hibernate.annotations.CreationTimestamp;
     import org.hibernate.annotations.UpdateTimestamp;
 
@@ -92,6 +92,10 @@
         @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
         @JsonManagedReference(value = "company-approval-workflows")
         private List<ApprovalWorkflow> approvalWorkflows = new ArrayList<>();
+
+        @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonManagedReference(value = "company-workflow-config")
+        private List<WorkflowConfiguration> workflowConfigurations = new ArrayList<>();
 
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)

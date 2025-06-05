@@ -1,5 +1,6 @@
-package com.backend.Onboarding.entities;
+package com.backend.Onboarding.entities.WorkflowConfig;
 
+import com.backend.Onboarding.entities.CompanyEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -23,8 +26,9 @@ public class WorkflowConfiguration {
     private LocalDate noticePeriodEffectiveDate;
     private Integer noticePeriodDuringProbation;
     private Integer noticePeriodAfterConfirmation;
-    private String noticePeriodMembersType;
-    private String noticePeriodMembersValues;
+
+    @OneToMany(mappedBy = "workflowConfiguration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NoticePeriodMember> noticePeriodMembers = new ArrayList<>();
 
     // Department Clearance Fields
     private String departmentName;
@@ -37,8 +41,9 @@ public class WorkflowConfiguration {
     private String probationPolicyName;
     private LocalDate probationEffectiveDate;
     private Integer probationDays;
-    private String probationMembersType; // e.g., "branch", "employee", etc.
-    private String probationMembersValues;
+
+    @OneToMany(mappedBy = "workflowConfiguration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProbationMembers> probationMembers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)

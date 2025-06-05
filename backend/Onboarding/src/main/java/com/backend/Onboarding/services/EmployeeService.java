@@ -10,7 +10,6 @@ import com.backend.Onboarding.repo.CompanyRepo;
 import com.backend.Onboarding.repo.EmployeeRepo;
 import com.backend.Onboarding.repo.ManagerRepo;
 import com.backend.Onboarding.repo.RolesRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,7 @@ public class EmployeeService {
     private final EmployeeRepo employeeRepo;
     private final CompanyRepo companyRepo;
     private final ManagerRepo managerRepo;
-    private RolesRepo rolesRepo;
+    private final RolesRepo rolesRepo;
 
     public EmployeeService(EmployeeRepo employeeRepo, CompanyRepo companyRepo, ManagerRepo managerRepo, RolesRepo rolesRepo) {
         this.employeeRepo = employeeRepo;
@@ -104,9 +103,8 @@ public class EmployeeService {
 
         // Set existing fields
         // Save the employee
-        Employees savedEmployee = employeeRepo.save(employee);
 
-        return savedEmployee;
+        return employeeRepo.save(employee);
     }
 
     private Manager validateAndGetManager(String managerId) {
@@ -140,7 +138,7 @@ public class EmployeeService {
             employeeRoles = new HashSet<>();
             managerEmployee.setRoles(employeeRoles);
         }
-        if (!employeeRoles.stream().anyMatch(role -> "MANAGER".equals(role.getRoleName()))) {
+        if (employeeRoles.stream().noneMatch(role -> "MANAGER".equals(role.getRoleName()))) {
             employeeRoles.add(managerRole);
             employeeRepo.save(managerEmployee); // Update the employee with the new role
         }
@@ -192,6 +190,76 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
+    // In EmployeeService.java
+
+    public List<String> getUniqueEmployeeNamesByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(e -> e.getId() + " - "+ e.getEmployeeFirstName() + " " + e.getEmployeeLastName())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueDepartmentsByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getDepartment)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueDesignationsByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getDesignation)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueEmployeeTypesByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getEmployeeType)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueEmploymentTypesByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getEmploymentType)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueGradesByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getGrade)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getUniqueRolesByCompanyId(UUID companyId) {
+        CompanyEntity company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found with ID: " + companyId));
+        return company.getEmployees().stream()
+                .map(Employees::getRole)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
     private ListEmployeesDTO mapToListEmpDTO(Employees employee) {
         // Get manager details

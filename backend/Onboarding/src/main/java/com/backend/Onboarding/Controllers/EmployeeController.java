@@ -128,17 +128,46 @@ public class EmployeeController {
         }
     }
 
-//    @PostMapping("/validate/excel")
-//    public ResponseEntity<?> validateExcelOfForEmployee(@RequestBody EmployeeCreationImportDTO employeeCreationImportDTO) {
-//        try {
-//            return CommonResponse.getData(importExcelService.validateExcelFileData(employeeService, EmployeeConstants.KEY_MAPPING_VALIDATE_EXCEL,
-//                    employeeCreationImportDTO.getFileName(), employeeCreationImportDTO.getFileContent(), new TypeReference<List<EmployeeCreationImportDTO>>() {
-//                    }, "EmployeeBankDetailImport"));
-//        } catch (AppException ae) {
-//            return CommonResponse.exception(ae.getMessage());
-//        } catch (Exception e) {
-//            return CommonResponse.somethingWentWrong(moduleName, e);
-//        }
-//    }
+    @GetMapping("/names/{companyId}")
+    public ResponseEntity<List<String>> getUniqueEmployeeNames(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueEmployeeNamesByCompanyId(id));
+    }
+
+    @GetMapping("/departments/{companyId}")
+    public ResponseEntity<List<String>> getUniqueDepartments(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueDepartmentsByCompanyId(id));
+    }
+
+    @GetMapping("/designations/{companyId}")
+    public ResponseEntity<List<String>> getUniqueDesignations(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueDesignationsByCompanyId(id));
+    }
+
+    @GetMapping("/employee-types/{companyId}")
+    public ResponseEntity<List<String>> getUniqueEmployeeTypes(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueEmployeeTypesByCompanyId(id));
+    }
+
+    @GetMapping("/employment-types/{companyId}")
+    public ResponseEntity<List<String>> getUniqueEmploymentTypes(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueEmploymentTypesByCompanyId(id));
+    }
+
+    @GetMapping("/grades/{companyId}")
+    public ResponseEntity<List<String>> getUniqueGrades(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueGradesByCompanyId(id));
+    }
+
+    @GetMapping("/roles/{companyId}")
+    public ResponseEntity<List<String>> getUniqueRoles(@PathVariable String companyId) {
+        UUID id = UUID.fromString(companyId);
+        return ResponseEntity.ok(employeeService.getUniqueRolesByCompanyId(id));
+    }
 
 }
