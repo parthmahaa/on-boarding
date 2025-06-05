@@ -5,6 +5,19 @@ export type PersonDetails = {
   phone: string
 }
 
+export interface Rule {
+  id: number;
+  condition: 'include' | 'exclude';
+  field: string;
+  operator: '==' | '!=';
+  value: string[];
+}
+
+export interface Task {
+  id: number;
+  text: string;
+}
+
 export type Company = {
   id: string;
   companyName: string;

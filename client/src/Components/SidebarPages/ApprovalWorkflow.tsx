@@ -172,7 +172,7 @@ const ApprovalWorkflow = () => {
   }
 
   return (
-    <div className="max-w-full p-4 bg-gray-50">
+    <div className="max-w-full  bg-gray-50">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900 mb-4">Approval Workflow</h1>
         

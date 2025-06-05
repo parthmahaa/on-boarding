@@ -287,8 +287,8 @@ const HolidayManagement = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen bg-gray-100">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-full mx-auto bg-white rounded-xl shadow-md p-6">
         <div className="flex mb-6 border-b">
           <button
             className={`px-4 py-2 ${activeTab === 'creation' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
@@ -431,8 +431,12 @@ const HolidayManagement = () => {
                 </select>
 
                 <div className="flex-1 relative">
+                  
                   {/* Selected values display */}
-                  <div className="min-h-[40px] p-2 border rounded-md bg-white flex flex-wrap gap-1 items-center">
+                  <div
+                    className="min-h-[40px] p-1 border rounded-md bg-white flex flex-wrap gap-1 items-center cursor-pointer"
+                    onClick={() => toggleDropdown(idx)}
+                  >
                     {(rule.value as string[]).map((selectedValue, valueIdx) => (
                       <span
                         key={valueIdx}
@@ -441,20 +445,19 @@ const HolidayManagement = () => {
                         {selectedValue}
                         <button
                           type="button"
-                          onClick={() => removeValueFromRule(idx, selectedValue)}
+                          onClick={e => {
+                            e.stopPropagation();
+                            removeValueFromRule(idx, selectedValue);
+                          }}
                           className="text-blue-600 hover:text-blue-800 font-bold"
                         >
                           ×
                         </button>
                       </span>
                     ))}
-                    <button
-                      type="button"
-                      onClick={() => toggleDropdown(idx)}
-                      className="text-gray-500 hover:text-gray-700 px-2 py-1"
-                    >
+                    <span className="text-gray-500 hover:text-gray-700 px-2 py-1">
                       {(rule.value as string[]).length === 0 ? 'Select Values' : '+ Add More'}
-                    </button>
+                    </span>
                   </div>
 
                   {/* Dropdown */}

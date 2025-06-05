@@ -311,13 +311,13 @@ export default function EmailProviderForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-full mx-auto bg-gray-50 py-8 flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="max-w-full mx-auto bg-gray-50 py-2 flex flex-col gap-6">
       {/* Main form box */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* HR block */}
           <div className="flex flex-col gap-4">
-            <label className="text-gray-700 font-medium">HR Username</label>
+            <label className="text-gray-700 font-medium">HR Username <span className="text-red-500">*</span></label>
             <input
               type="email"
               value={hrUsername}
@@ -326,7 +326,7 @@ export default function EmailProviderForm() {
             />
           </div>
           <div className="flex flex-col gap-4 relative">
-            <label className="text-gray-700 font-medium">HR Email Password</label>
+            <label className="text-gray-700 font-medium">HR Email Password <span className="text-red-500">*</span></label>
             <div className="relative">
               <input
                 type={showHrPassword ? 'text' : 'password'}
@@ -364,7 +364,7 @@ export default function EmailProviderForm() {
 
           {/* Offer block */}
           <div className="flex flex-col gap-4">
-            <label className="text-gray-700 font-medium">Offer Username</label>
+            <label className="text-gray-700 font-medium">Offer Username<span className="text-red-500">*</span></label>
             <input
               type="email"
               value={offerUsername}
@@ -373,7 +373,7 @@ export default function EmailProviderForm() {
             />
           </div>
           <div className="flex flex-col gap-4 relative">
-            <label className="text-gray-700 font-medium">Offer Email Password</label>
+            <label className="text-gray-700 font-medium">Offer Email Password <span className="text-red-500">*</span></label>
             <div className="relative">
               <input
                 type={showOfferPassword ? 'text' : 'password'}
