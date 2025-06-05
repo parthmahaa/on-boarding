@@ -21,6 +21,7 @@ import {
   EnvelopeIcon,
   PhoneIcon
 } from '@heroicons/react/24/outline';
+import {X} from 'lucide-react'
 import CompanyDetailsForm from './CompanyDetailsForm';
 import SBUList from './SBUList';
 import SBUForm from './SBUForm';
@@ -144,9 +145,6 @@ const CompanyDetail = () => {
               </Box>
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton>
-                <EyeIcon style={{ width: 20, height: 20 }} />
-              </IconButton>
               <IconButton onClick={() => setIsCompanyEditOpen(true)}>
                 <PencilIcon style={{ width: 20, height: 20 }} />
               </IconButton>
@@ -221,13 +219,18 @@ const CompanyDetail = () => {
           open={isSBUFormOpen}
           onClose={() => setIsSBUFormOpen(false)}
           PaperProps={{
-            sx: { width: { xs: '100%', md: '800px' } }
+            sx: { width: { xs: '100%', md: '100%' } }
           }}
         >
           <Box sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              SBU Detail
+            <div className='flex justify-between'>
+            <Typography className='text-center' variant="h6" sx={{  }}>
+              ADD SBU
             </Typography>
+            <button onClick={() => setIsSBUFormOpen(false)}>
+              <X className='text-red-500 size-xs cursor-pointer'/>
+            </button>
+            </div>
             <SBUForm
               sbu={selectedSBU}
               onClose={() => setIsSBUFormOpen(false)}

@@ -7,6 +7,15 @@ import { Trash2 } from 'lucide-react';
 const DepartmentClearance: React.FC = () => {
   const { departmentClearance, updateDepartmentClearance } = useWorkflowStore();
 
+  // Add a default task on mount if there are no tasks
+  React.useEffect(() => {
+    if (!departmentClearance.tasks || departmentClearance.tasks.length === 0) {
+      updateDepartmentClearance({
+        tasks: [{ id: Date.now(), text: '' }]
+      });
+    }
+  }, []);
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateDepartmentClearance({ [name]: value });

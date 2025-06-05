@@ -12,7 +12,7 @@ import DashboardLayout from './Components/DashboardLayout';
 import AddEmployee from './Components/Employees/AddEmployee';
 // Import all sidebar page components
 import Company from './Components/SidebarPages/Company/Company';
-import Branch from './Components/SidebarPages/Branch';
+import Branch from './Components/SidebarPages/Branch/Branch';
 import WorkSchedule from './Components/SidebarPages/WorkSchedule';
 import AttendancePolicy from './Components/SidebarPages/AttendancePolicy';
 import LeavePolicy from './Components/SidebarPages/LeavePolicy';
