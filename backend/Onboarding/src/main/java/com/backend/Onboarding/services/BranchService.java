@@ -66,6 +66,15 @@ public class BranchService {
         return mapToBranchDTO(editedBranch);
     }
 
+    public String updateStatus(Long branchId) {
+        Branch branch = branchRepo.findById(branchId)
+                .orElseThrow(() -> new IllegalArgumentException("Branch not found with ID: " + branchId));
+        boolean currentStatus = branch.getStatus() != null ? branch.getStatus() : true;
+        branch.setStatus(!currentStatus);
+        branchRepo.save(branch);
+        return "Branch status updated for branch ID: " + branchId;
+    }
+
     public Branch mapToBranch(BranchDTO dto){
         Branch branch = new Branch();
         branch.setBranchName(dto.getBranchName());
@@ -87,6 +96,7 @@ public class BranchService {
     public BranchDTO mapToBranchDTO(Branch branch){
         BranchDTO dto = new BranchDTO();
 
+        dto.setId(branch.getId());
         dto.setBranchName(branch.getBranchName());
         dto.setPincode(branch.getPincode());
         dto.setCountry(branch.getCountry());

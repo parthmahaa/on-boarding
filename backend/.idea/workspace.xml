@@ -5,23 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a8708e4d-2e52-4798-ad0e-0f90dc2a0a36" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/WorkflowConfigurationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/WorkflowConfigurationDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/WorkflowConfig/NoticePeriodMember.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/WorkflowConfig/ProbationMembers.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/WorkflowConfig/WorkflowConfiguration.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/repo/WorkflowConfigRepo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/WorkflowConfigurationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/EmployeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/EmployeeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/entities/CompanyEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/EmployeeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/ApprovalWorkflow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/ApprovalWorkflow.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Holiday.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/Holiday.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/SmtpSetup.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/SmtpSetup.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/WorkflowManagement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/WorkflowManagement.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/store/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/store/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../client/src/utilities/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/utilities/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/BranchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/Controllers/BranchController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/BranchDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/DTO/BranchDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/BranchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Onboarding/src/main/java/com/backend/Onboarding/services/BranchService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client/src/Components/SidebarPages/WorkflowConfig/DepartmentClearance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../client/src/Components/SidebarPages/WorkflowConfig/DepartmentClearance.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

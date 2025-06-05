@@ -63,6 +63,20 @@ public class BranchController {
 
     }
 
+    @PatchMapping("/status/{id}")
+    public ResponseEntity<?> updateBranchStatus(@PathVariable Long id){
+
+        String response = branchService.updateStatus(id);
+
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.ACCEPTED.value(),
+                "Status Updated",
+                response,
+                false
+        ),HttpStatus.ACCEPTED);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<?> editBranch(@PathVariable Long id, @RequestBody @Valid BranchDTO updates){
 

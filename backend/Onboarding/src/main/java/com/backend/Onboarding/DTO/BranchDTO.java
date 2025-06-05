@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class BranchDTO {
 
+    private Long id;
+
     private String branchName;
 
     @Size(min = 6, max = 6, message = "Pincode must be exactly 6 digits")
