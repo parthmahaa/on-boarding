@@ -31,7 +31,7 @@ interface Branch {
   isPayrollBranch: boolean;
   status: boolean | null;
   PTNumber: string;
-  LWNumber: string;
+  LWFNumber: string;  // Changed from LWNumber to be consistent
   ESICNumber: string;
   // Add an id field if not present
   id?: string;
@@ -39,9 +39,10 @@ interface Branch {
 
 interface BranchListProps {
   onAddBranch: () => void;
+  onEditBranch: (branch: Branch) => void;
 }
 
-const BranchList: React.FC<BranchListProps> = ({ onAddBranch }) => {
+const BranchList: React.FC<BranchListProps> = ({ onAddBranch, onEditBranch }) => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [updatingIds, setUpdatingIds] = useState<string[]>([]); // Track switches being updated
@@ -113,6 +114,10 @@ const BranchList: React.FC<BranchListProps> = ({ onAddBranch }) => {
   if(loading){
     return <Loader/>
   }
+
+  const handleEditBranch = (branch: Branch) => {
+    onEditBranch(branch);
+  };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 1 }}>
@@ -194,7 +199,7 @@ const BranchList: React.FC<BranchListProps> = ({ onAddBranch }) => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton size="small">
+                      <IconButton size="small" onClick={() => handleEditBranch(row)}>
                         <Edit size={16} />
                       </IconButton>
                     </Box>
@@ -212,13 +217,34 @@ const BranchList: React.FC<BranchListProps> = ({ onAddBranch }) => {
 // Main Branch component to toggle between list and form
 const Branch: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+
+  const handleEditBranch = (branch: Branch) => {
+    setSelectedBranch(branch);
+    setShowForm(true);
+  };
+
+  const handleClose = () => {
+    setShowForm(false);
+    setSelectedBranch(null);
+  };
 
   return (
     <Box sx={{ p: 2 }}>
       {!showForm ? (
-        <BranchList onAddBranch={() => setShowForm(true)} />
+        <BranchList 
+          onAddBranch={() => {
+            setSelectedBranch(null);
+            setShowForm(true);
+          }} 
+          onEditBranch={handleEditBranch}
+        />
       ) : (
-        <BranchForm onClose={() => setShowForm(false)} />
+        <BranchForm 
+          onClose={handleClose} 
+          initialData={selectedBranch}
+          mode={selectedBranch ? 'edit' : 'create'}
+        />
       )}
     </Box>
   );

@@ -9,9 +9,8 @@ import { toast } from 'react-toastify';
 import Loader from '../../utilities/Loader';
 
 const WorkflowConfiguration: React.FC = () => {
-  const { isLoading, error, companyId } = useWorkflowStore();
+  const { isLoading, companyId } = useWorkflowStore();
   const [saving, setSaving] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
   const state = useWorkflowStore();
 
   const saveConfiguration = async () => {
@@ -37,7 +36,7 @@ const WorkflowConfiguration: React.FC = () => {
     }
   };
 
-  if(saving){
+  if(saving || isLoading){
     return <Loader/>
   }
 
@@ -47,13 +46,6 @@ const WorkflowConfiguration: React.FC = () => {
         <NoticePeriod />
         <DepartmentClearance />
         <ProbationSetup />
-
-        {(error || localError) && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
-            {error || localError}
-          </div>
-        )}
-
         <div className="mt-8 flex justify-end">
           <button 
             className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors mr-3"
