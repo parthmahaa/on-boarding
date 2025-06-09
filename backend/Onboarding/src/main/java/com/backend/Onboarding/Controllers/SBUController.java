@@ -37,7 +37,7 @@ public class SBUController {
                 return new ResponseEntity<>(new ResponseWrapper<>(
                         LocalDateTime.now(),
                         HttpStatus.BAD_REQUEST.value(),
-                        "No SBUs found",
+                        "Failed to add",
                         null,
                         true
                 ), HttpStatus.BAD_REQUEST);
@@ -46,7 +46,7 @@ public class SBUController {
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.OK.value(),
-                    "Fetched SBUs",
+                    "SBU added",
                     sbus,
                     false
             ),HttpStatus.OK);
@@ -94,10 +94,9 @@ public class SBUController {
         }
     }
 
-    @PatchMapping(path ="/{id}")
+    @PatchMapping(path ="/edit/{id}")
     public ResponseEntity<ResponseWrapper<UpdateSbuDTO>> editSbu(@PathVariable Long id, @RequestBody UpdateSbuDTO updates){
         UpdateSbuDTO edittedSbu = sbuService.editSbu(id,updates);
-
             return new ResponseEntity<>(new ResponseWrapper<>(
                     LocalDateTime.now(),
                     HttpStatus.OK.value(),
@@ -106,5 +105,31 @@ public class SBUController {
                     false
                     ),HttpStatus.OK);
 
+    }
+
+    @PatchMapping("/status/{id}")
+    public ResponseEntity<?> updateSbuStatus(@PathVariable Long id){
+
+        String response = sbuService.updateStatus(id);
+
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.ACCEPTED.value(),
+                "Status Updated",
+                response,
+                false
+        ),HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/{companyId}/names")
+    public ResponseEntity<ResponseWrapper<List<String>>> getUniqueSbuNamesByCompanyId(@PathVariable String companyId) {
+        List<String> uniqueNames = sbuService.getAllUniqueSbuNamesByCompanyId(UUID.fromString(companyId));
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.OK.value(),
+                "Fetched unique SBU names for company",
+                uniqueNames,
+                false
+        ), HttpStatus.OK);
     }
 }

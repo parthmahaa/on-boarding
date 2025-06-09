@@ -6,19 +6,17 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@Table(name = "employees")
+@Table(name = "tbl_employees")
 @Data
 public class Employees {
 
     @Id
     @Column(name = "id")
-    private String id; //DEFAULT- prefix of SBU + sequence
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
@@ -111,6 +109,9 @@ public class Employees {
 
     @Column
     private String aadharNo; // Optional
+
+    @Column(name = "isAdmin")
+    private Boolean isAdmin;
 
     @Column
     private String panNo; // Optional

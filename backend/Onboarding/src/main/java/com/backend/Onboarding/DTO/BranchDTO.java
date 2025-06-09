@@ -40,4 +40,6 @@ public class BranchDTO {
     @JsonProperty("ESICNumber")
     private String ESICNumber;
 
+    private String createdBy;
+
 }

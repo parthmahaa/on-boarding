@@ -85,6 +85,11 @@ public class SBU {
     private String IFSCcode;
     private String bankAddress;
 
+    @Column(name = "sbu_status")
+    private Boolean sbuStatus;
+
+    private String createdBy;
+
     // Relationship to CompanyEntity
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

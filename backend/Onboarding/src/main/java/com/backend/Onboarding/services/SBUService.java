@@ -2,6 +2,7 @@ package com.backend.Onboarding.services;
 
 import com.backend.Onboarding.DTO.AddSbuDTO;
 import com.backend.Onboarding.DTO.UpdateSbuDTO;
+import com.backend.Onboarding.entities.Branch;
 import com.backend.Onboarding.entities.CompanyEntity;
 import com.backend.Onboarding.entities.HrEmails;
 import com.backend.Onboarding.entities.SBU;
@@ -47,6 +48,7 @@ public class SBUService {
         sbu.setRegistrationDate(dto.getRegistrationDate());
         sbu.setIdentificationNumber(dto.getIdentificationNumber());
         sbu.setTanNumber(dto.getTanNumber());
+        sbu.setCreatedBy(dto.getCreatedBy());
         sbu.setPanNumber(dto.getPanNumber());
         sbu.setPincode(dto.getPincode());
         sbu.setCountry(dto.getCountry());
@@ -55,9 +57,14 @@ public class SBUService {
         sbu.setPhoneNumber(dto.getPhoneNumber());
         sbu.setAddress(dto.getAddress());
         sbu.setSalarySlipFormat(dto.getSalarySlipFormat());
-        sbu.setEmployeeIdBySBU(dto.isEmployeeIdBySBU());
-        sbu.setEmpNoPrefix(dto.getEmpNoPrefix()); //  this is only set if employeeIdBySBU is true
-        sbu.setTotalDigits(dto.getTotalDigits()); //  this is only set if employeeIdBySBU is true
+
+        if(dto.isEmployeeIdBySBU()){
+            sbu.setEmpNoPrefix(dto.getEmpNoPrefix());
+            sbu.setTotalDigits(dto.getTotalDigits());
+        }else{
+            sbu.setEmpNoPrefix(company.getEmpIdPrefix());
+            sbu.setTotalDigits(company.getTotalDigits() != null ? company.getTotalDigits() : 3); // Default to 0 or another sensible value
+        }
         sbu.setHrPhoneNumber(dto.getHrPhoneNumber());
         sbu.setHrWhatsappPhoneNumber(dto.getHrWhatsappPhoneNumber());
         sbu.setTicketUpdates(dto.isTicketUpdates());
@@ -122,8 +129,26 @@ public class SBUService {
         return mapToUpdateSbuDTO(updatedSbu);
     }
 
+    public String updateStatus(Long sbuId) {
+        SBU sbu = sbuRepo.findById(sbuId)
+                .orElseThrow(() -> new IllegalArgumentException("SBU not found with ID: " + sbuId));
+        boolean currentStatus = sbu.getSbuStatus() != null ? sbu.getSbuStatus() : true;
+        sbu.setSbuStatus(!currentStatus);
+        sbuRepo.save(sbu);
+        return "SBU status updated for ID: " + sbuId;
+    }
+
+    public List<String> getAllUniqueSbuNamesByCompanyId(UUID companyId) {
+        return sbuRepo.findByCompanyCompanyId(companyId).stream()
+                .map(SBU::getName)
+                .filter(name -> name != null && !name.isEmpty())
+                .distinct()
+                .toList();
+    }
+
     public UpdateSbuDTO mapToUpdateSbuDTO(SBU sbu) {
         UpdateSbuDTO dto = new UpdateSbuDTO();
+        dto.setId(sbu.getId());
         dto.setCompanyLogo(sbu.getCompanyLogo());
         dto.setName(sbu.getName());
         dto.setShortName(sbu.getShortName());
@@ -132,6 +157,7 @@ public class SBUService {
         dto.setRegistrationDate(sbu.getRegistrationDate());
         dto.setPincode(sbu.getPincode());
         dto.setCountry(sbu.getCountry());
+        dto.setCreatedBy(sbu.getCreatedBy());
         dto.setState(sbu.getState());
         dto.setCity(sbu.getCity());
         dto.setPanNumber(sbu.getPanNumber());
@@ -154,6 +180,7 @@ public class SBUService {
         dto.setAccountNumber(sbu.getAccountNumber());
         dto.setBankAddress(sbu.getBankAddress());
         dto.setIFSCcode(sbu.getIFSCcode());
+        dto.setSbuStatus(sbu.getSbuStatus());
         return dto;
     }
 }

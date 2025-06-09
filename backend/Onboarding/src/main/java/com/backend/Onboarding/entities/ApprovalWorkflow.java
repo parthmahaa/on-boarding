@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "approval_workflows")
+@Table(name = "tbl_approval_workflows")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

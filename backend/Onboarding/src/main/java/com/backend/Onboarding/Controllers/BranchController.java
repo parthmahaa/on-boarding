@@ -80,14 +80,28 @@ public class BranchController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> editBranch(@PathVariable Long id, @RequestBody @Valid BranchDTO updates){
 
-        BranchDTO edittedBranch = branchService.editBranch(id,updates);
+        BranchDTO editedBranch = branchService.editBranch(id,updates);
 
         return new ResponseEntity<>(new ResponseWrapper<>(
                 LocalDateTime.now(),
                 HttpStatus.OK.value(),
                 "Branch Updated",
-                edittedBranch,
+                editedBranch,
                 false
         ),HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/names")
+    public ResponseEntity<ResponseWrapper<List<String>>> getUniqueBranchNames(@PathVariable String id) {
+        UUID companyId = UUID.fromString(id);
+        List<String> uniqueNames = branchService.getUniqueBranchNamesByCompanyId(companyId);
+
+        return new ResponseEntity<>(new ResponseWrapper<>(
+                LocalDateTime.now(),
+                HttpStatus.OK.value(),
+                "Unique Branch Names Found",
+                uniqueNames,
+                false
+        ), HttpStatus.OK);
     }
 }

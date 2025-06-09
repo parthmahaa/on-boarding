@@ -10,6 +10,8 @@ import java.util.UUID;
 @Data
 public class UpdateSbuDTO {
 
+    private Long id;
+
     private String companyLogo;
 
     private String name;
@@ -35,10 +37,11 @@ public class UpdateSbuDTO {
 
     private String state;
 
+    private Boolean sbuStatus;
+
     private String city;
 
     private String phoneNumber;
-
     private String address;
 
     // HR details
@@ -55,6 +58,8 @@ public class UpdateSbuDTO {
     private List<String> hrEmails;
 
     private Boolean ticketUpdates;
+
+    private String createdBy;
 
     // Bank details
     private String bankName;

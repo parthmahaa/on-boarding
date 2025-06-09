@@ -28,20 +28,21 @@ public class CompanyService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final OtpService otpService;
     private final Map<String, PendingRegistration> pendingRegistrations = new HashMap<>();
-
+    private final BranchRepo branchRepo;
     @Value("${app.onboarding.base-url}")
     private String baseUrl;
 
     private static final String BASE62_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final int URL_LENGTH = 8;
 
-    public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder, OtpService otpService) {
+    public CompanyService(CompanyRepo companyRepo, EmailService emailService, EmployeeRepo employeeRepo, RolesRepo rolesRepo, BCryptPasswordEncoder passwordEncoder, OtpService otpService, BranchRepo branchRepo) {
         this.companyRepo = companyRepo;
         this.emailService = emailService;
         this.employeeRepo = employeeRepo;
         this.rolesRepo = rolesRepo;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.branchRepo = branchRepo;
     }
 
     public String initiateRegistration(CompanyRegisterationDTO dto) {
@@ -180,6 +181,7 @@ public class CompanyService {
         registeringEmployee.setEmployeePhone(dto.getPhone());
         registeringEmployee.setRoles(registeringEmployeeRoles);
         registeringEmployee.setPassword(passwordEncoder.encode(userPassword)); // Use user-provided password
+        registeringEmployee.setIsAdmin(true);
 
         // Prepare additional employees if designation is "OTHER"
         Employees ownerEmployee = null;
@@ -200,6 +202,7 @@ public class CompanyService {
             ownerEmployee.setId(dto.getOwnerDetails().getId() != null && !dto.getOwnerDetails().getId().isEmpty() ?
                     dto.getOwnerDetails().getId() : UUID.randomUUID().toString());
             ownerEmployee.setCompany(company);
+            ownerEmployee.setIsAdmin(true);
             ownerEmployee.setCompanyName(company.getCompanyName());
             ownerEmployee.setEmployeeFirstName(dto.getOwnerDetails().getFirstName());
             ownerEmployee.setEmployeeLastName(dto.getOwnerDetails().getLastName());
@@ -224,6 +227,7 @@ public class CompanyService {
             hrEmployee.setId(dto.getHrDetails().getId() != null && !dto.getHrDetails().getId().isEmpty() ?
                     dto.getHrDetails().getId() : UUID.randomUUID().toString());
             hrEmployee.setCompany(company);
+            hrEmployee.setIsAdmin(true);
             hrEmployee.setCompanyName(company.getCompanyName());
             hrEmployee.setEmployeeFirstName(dto.getHrDetails().getFirstName());
             hrEmployee.setEmployeeLastName(dto.getHrDetails().getLastName());
@@ -262,10 +266,20 @@ public class CompanyService {
             );
         }
 
-        System.out.println("Company save start");
         company = companyRepo.save(company);
-        System.out.println("Company saved, employee start");
         employeeRepo.save(registeringEmployee);
+
+        // Create and save branch
+        Branch branch = new Branch();
+        branch.setBranchName(dto.getCompanyName());
+        branch.setBranchAddress(dto.getAddress());
+        branch.setPincode(dto.getPincode());
+        branch.setStatus(true); // or set as needed
+        branch.setCreatedBy(dto.getEmail());
+        branch.setCompany(company);
+        // Set other fields as needed from DTO
+
+        branchRepo.save(branch);
 
         if (ownerEmployee != null) employeeRepo.save(ownerEmployee);
         if (hrEmployee != null) employeeRepo.save(hrEmployee);
@@ -326,6 +340,7 @@ public class CompanyService {
         CompanyBasicDTO fetchedCompany = new CompanyBasicDTO();
         fetchedCompany.setCompanyId(company.getCompanyId().toString());
         fetchedCompany.setCompanyName(company.getCompanyName());
+        fetchedCompany.setLogo(company.getLogo());
 
         return fetchedCompany;
     }
@@ -341,39 +356,39 @@ public class CompanyService {
 
     public CompanyDetailsDTO editCompany(UUID companyId, Map<String, Object> updates) {
         boolean exists = companyRepo.existsById(companyId);
-        if(exists){
-            try{
-                CompanyEntity companyToEdit = companyRepo.findById(companyId).orElseThrow(() ->  new RuntimeException("Company Not found"));
+        if (exists) {
+            try {
+                CompanyEntity companyToEdit = companyRepo.findById(companyId)
+                        .orElseThrow(() -> new RuntimeException("Company Not found"));
 
-                updates.forEach((field, value) ->{
+                updates.forEach((field, value) -> {
                     Field fieldToUpdate = ReflectionUtils.findField(CompanyEntity.class, field);
-                    if(fieldToUpdate != null){
+                    if (fieldToUpdate != null) {
                         fieldToUpdate.setAccessible(true);
-                        ReflectionUtils.setField(fieldToUpdate,companyToEdit,value);
+                        ReflectionUtils.setField(fieldToUpdate, companyToEdit, value);
                     }
                 });
 
                 CompanyEntity updatedCompany = companyRepo.save(companyToEdit);
                 return mapToCompanyDTO(updatedCompany);
-            }catch (Exception e){
-                throw new RuntimeException("Failed to Update:" +e.getMessage());
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to Update:" + e.getMessage());
             }
         }
-
         return null;
     }
 
-    public CompanyDetailsDTO mapToCompanyDTO(CompanyEntity company){
+    public CompanyDetailsDTO mapToCompanyDTO(CompanyEntity company) {
         CompanyDetailsDTO dto = new CompanyDetailsDTO();
         dto.setId(company.getCompanyId());
         dto.setCompanyName(company.getCompanyName());
         dto.setShortName(company.getShortName());
         dto.setGstRegistrationNumber(company.getGstRegisterationNumber());
         dto.setUrl(company.getPublicUrl());
+        dto.setNoOfEmployees(company.getNoOfEmployees());
         dto.setType(company.getType());
-        dto.setRegistrationDate(company.getCreatedAt());
+        dto.setRegistrationDate(company.getRegistrationDate());
         dto.setIdentificationNumber(company.getIdentificationNumber());
-        dto.setGstRegistrationNumber(company.getGstRegisterationNumber());
         dto.setTanNumber(company.getTanNumber());
         dto.setPanNumber(company.getPanNumber());
         dto.setPincode(company.getPincode());
@@ -383,6 +398,23 @@ public class CompanyService {
         dto.setAddress(company.getAddress());
         dto.setLogo(company.getLogo());
         dto.setCompanyStatus(company.getStatus());
+        dto.setCompanyUrl(company.getCompanyUrl());
+
+        // Map new fields
+        dto.setTotalDigits(company.getTotalDigits());
+        dto.setPfNumber(company.getPfNumber());
+        dto.setEsicNumber(company.getEsicNumber());
+        dto.setGratuityNumber(company.getGratuityNumber());
+        dto.setEmpIdPrefix(company.getEmpIdPrefix());
+        dto.setSalarySlipType(company.getSalarySlipType());
+        dto.setSalarySlipFormat(company.getSalarySlipFormat());
+        dto.setHrPhoneNumber(company.getHrPhoneNumber());
+        dto.setHrWhatsappPhoneNumber(company.getHrWhatsappPhoneNumber());
+        dto.setBankName(company.getBankName());
+        dto.setAccountNumber(company.getAccountNumber());
+        dto.setBranchCode(company.getBranchCode());
+        dto.setIFSCcode(company.getIFSCcode());
+        dto.setBankAddress(company.getBankAddress());
 
         return dto;
     }

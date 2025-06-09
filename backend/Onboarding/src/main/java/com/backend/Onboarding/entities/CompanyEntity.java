@@ -11,6 +11,7 @@
     import org.hibernate.annotations.CreationTimestamp;
     import org.hibernate.annotations.UpdateTimestamp;
 
+    import java.time.LocalDate;
     import java.time.LocalDateTime;
     import java.util.ArrayList;
     import java.util.List;
@@ -20,7 +21,7 @@
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
-    @Table(name = "companies")
+    @Table(name = "tbl_companies")
     public class CompanyEntity {
 
         @Id
@@ -64,14 +65,62 @@
         @Column(name = "short_name")
         private String shortName;
 
+        @Column(name = "registration_date")
+        private LocalDate registrationDate;
+
+        @Column(name = "pfNumber")
+        private String pfNumber;
+
+        @Column(name = "ESIC_number")
+        private String esicNumber;
+
+        @Column(name = "gratuity_number")
+        private String gratuityNumber;
+
+        @Column(name = "emp_id_prefix")
+        private String empIdPrefix;
+
+        @Column(name = "emp_id_total_digits")
+        private Integer totalDigits;
+
+        @Column(name = "salary_slip_type")
+        private String salarySlipType;
+
+        @Column(name = "salary_slip_format")
+        private String salarySlipFormat;
+
+        @Column(name = "hr_phone_number")
+        private String hrPhoneNumber;
+
+        @Column(name = "hr_whatsapp_number")
+        private String hrWhatsappPhoneNumber;
+
         @Column(nullable = false, unique = true)
         private String publicUrl;
+
+        @Column(name = "company_url")
+        private String companyUrl;
 
         @Column(name = "company_type")
         private String type;
 
+        @Column(name = "company_bank_name")
+        private String bankName;
+
+        @Column(name = "company_acc_number")
+        private String accountNumber;
+
+        @Column(name = "company_branch_code")
+        private String branchCode;
+
+        @Column(name = "company_ifsc_code")
+        private String IFSCcode;
+
+        @Column(name = "company_bank_address")
+        private String bankAddress;
+
         @Column(name = "identification_no")
-        private Long identificationNumber;
+        private String identificationNumber;
 
         @Enumerated(EnumType.STRING)
         @Column(name = "status")

@@ -59,6 +59,8 @@ public class AddSbuDTO {
 
     private boolean ticketUpdates;
 
+    private String createdBy;
+
     // Bank details
     private String bankName;
     private String accountNumber;

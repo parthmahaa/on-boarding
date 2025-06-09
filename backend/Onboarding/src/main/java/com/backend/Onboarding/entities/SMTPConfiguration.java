@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "SMPT_Configuration")
+@Table(name = "tbl_smtp_Configuration")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

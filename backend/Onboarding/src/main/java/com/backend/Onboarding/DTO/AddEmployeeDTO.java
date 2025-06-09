@@ -13,7 +13,6 @@ public class AddEmployeeDTO {
     private String sbu;
 
     // Optional ID field
-    @Pattern(regexp = "^[A-Za-z0-9]{1,10}$", message = "Employee ID must be alphanumeric and up to 10 characters")
     private String id;
 
     // Mandatory Fields
@@ -28,7 +27,7 @@ public class AddEmployeeDTO {
     private String lastName;
 
     @NotBlank(message = "Gender is mandatory")
-    @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be MALE, FEMALE, or OTHER")
+//    @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be MALE, FEMALE, or OTHER")
     private String gender;
 
     @NotNull(message = "Date of Joining (DOJ) is mandatory")
@@ -42,10 +41,10 @@ public class AddEmployeeDTO {
     @Pattern(regexp = "\\d{2}-[A-Za-z]{3}-\\d{4}", message = "Actual DOB must be in DD-MMM-YYYY format")
     private String actualDateOfBirth;
 
-    @Pattern(regexp = "\\d{12}", message = "Aadhar No must be 12 digits")
+//    @Pattern(regexp = "\\d{12}", message = "Aadhar No must be 12 digits")
     private String aadharNo;
 
-    @Pattern(regexp = "[A-Z]{5}[0-9]{4}[A-Z]{1}", message = "PAN No must be in the format XXXXX9999X")
+//    @Pattern(regexp = "[A-Z]{5}[0-9]{4}[A-Z]{1}", message = "PAN No must be in the format XXXXX9999X")
     private String panNo;
 
     @NotNull(message = "Email is required")
@@ -56,15 +55,12 @@ public class AddEmployeeDTO {
     @Size(max = 100, message = "Branch must be less than 100 characters")
     private String branch;
 
-    @NotBlank(message = "Compliance Branch is mandatory")
-    @Size(max = 100, message = "Compliance Branch must be less than 100 characters")
-    private String complianceBranch;
 
     @NotBlank(message = "Designation is mandatory")
     @Size(max = 100, message = "Designation must be less than 100 characters")
     private String designation;
 
-    @NotBlank(message = "Grade is mandatory")
+//    @NotBlank(message = "Grade is mandatory")
     @Size(max = 20, message = "Grade must be less than 20 characters")
     private String grade;
 
@@ -80,8 +76,6 @@ public class AddEmployeeDTO {
     @Pattern(regexp = "ON_PROBATION|COMPLETED|EXTENDED", message = "Probation Status must be ON_PROBATION, COMPLETED, or EXTENDED")
     private String probationStatus;
 
-    @NotNull(message = "SalaryOn is mandatory")
-    private String salaryOn;
 
     @NotNull(message = "Department is required")
     private String department;

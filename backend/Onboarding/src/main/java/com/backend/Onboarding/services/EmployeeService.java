@@ -81,9 +81,7 @@ public class EmployeeService {
 
         employee.setGender(dto.getGender());
         employee.setSbu(dto.getSbu());
-        employee.setSalaryOn(dto.getSalaryOn());
         employee.setBranch(dto.getBranch());
-        employee.setComplianceBranch(dto.getComplianceBranch());
         employee.setDesignation(dto.getDesignation());
         employee.setGrade(dto.getGrade());
         employee.setEmployeeType(dto.getEmployeeType());

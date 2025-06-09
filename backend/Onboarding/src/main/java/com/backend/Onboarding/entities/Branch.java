@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "branches")
+@Table(name = "tbl_branches")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,6 +45,9 @@ public class Branch {
 
     @Column(name = "payroll_branch")
     private Boolean isPayrollBranch;
+
+    @Column(name = "created_by")
+    private String createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)

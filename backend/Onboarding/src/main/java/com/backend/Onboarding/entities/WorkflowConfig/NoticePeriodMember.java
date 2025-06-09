@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "notice_period_members")
+@Table(name = "tbl_notice_period_members")
 public class NoticePeriodMember {
 
     @Id

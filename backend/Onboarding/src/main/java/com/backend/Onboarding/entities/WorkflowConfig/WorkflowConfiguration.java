@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "workflow_config")
+@Table(name = "tbl_workflow_config")
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowConfiguration {

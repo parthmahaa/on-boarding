@@ -75,6 +75,14 @@ public class BranchService {
         return "Branch status updated for branch ID: " + branchId;
     }
 
+    public List<String> getUniqueBranchNamesByCompanyId(UUID companyId) {
+        return branchRepo.findAll().stream()
+                .filter(branch -> branch.getCompany().getCompanyId().equals(companyId))
+                .map(Branch::getBranchName)
+                .distinct()
+                .toList();
+    }
+
     public Branch mapToBranch(BranchDTO dto){
         Branch branch = new Branch();
         branch.setBranchName(dto.getBranchName());
@@ -85,7 +93,7 @@ public class BranchService {
         branch.setBranchAddress(dto.getBranchAddress());
         branch.setTimeZone(dto.getTimeZone());
         branch.setIsPayrollBranch(dto.getIsPayrollBranch());
-
+        branch.setCreatedBy(dto.getCreatedBy());
         branch.setPTNumber(dto.getPTNumber());
         branch.setLWNumber(dto.getLWNumber());
         branch.setESICNumber(dto.getESICNumber());
@@ -98,6 +106,7 @@ public class BranchService {
 
         dto.setId(branch.getId());
         dto.setBranchName(branch.getBranchName());
+        dto.setCreatedBy(branch.getCreatedBy());
         dto.setPincode(branch.getPincode());
         dto.setCountry(branch.getCountry());
         dto.setState(branch.getState());
